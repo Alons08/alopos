@@ -3,8 +3,6 @@ package com.alocode.model;
 
 import lombok.*;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.alocode.model.enums.EstadoCaja;

@@ -14,8 +14,6 @@ import com.alocode.model.enums.EstadoPedido;
 import com.alocode.service.CajaService;
 import com.alocode.service.PedidoService;
 
-import java.util.Date;
-
 @Controller
 @RequestMapping("/caja")
 public class CajaController {

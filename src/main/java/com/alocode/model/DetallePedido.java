@@ -2,7 +2,6 @@ package com.alocode.model;
 
 import lombok.*;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "detalle_pedido")
