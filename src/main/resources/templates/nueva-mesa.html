@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Mesa - Sistema de Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #f8f9fc;
+            --success-color: #1cc88a;
+            --text-dark: #5a5c69;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--secondary-color);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #B983FF 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d3e2;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn-submit {
+            background-color: var(--success-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #17a673;
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+        }
+        
+        .input-icon {
+            position: relative;
+        }
+        
+        .input-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .input-icon input, .input-icon select {
+            padding-left: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-container">
+                        <div class="form-card card">
+                            <div class="card-header">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-table me-3" style="font-size: 1.5rem;"></i>
+                                    <h4 class="mb-0">Registrar Nueva Mesa</h4>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <form th:action="@{/mesas/guardar}" th:object="${mesa}" method="post" class="needs-validation" novalidate>
+                                    <input type="hidden" th:field="*{id}" />
+                                    
+                                    <!-- Número de Mesa -->
+                                    <div class="mb-4 input-icon">
+                                        <label for="numero" class="form-label">Número de Mesa</label>
+                                        <i class="bi bi-123"></i>
+                                        <input type="number" id="numero" th:field="*{numero}" class="form-control" 
+                                               min="1" placeholder="Ingrese el número de mesa" required />
+                                        <div th:if="${#fields.hasErrors('numero')}" class="text-danger small mt-1">
+                                            <span th:errors="*{numero}"></span>
+                                        </div>
+                                        <div th:if="${error}" class="text-danger small mt-1">
+                                            <span th:text="${error}"></span>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese un número válido.
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Capacidad -->
+                                    <div class="mb-4 input-icon">
+                                        <label for="capacidad" class="form-label">Capacidad</label>
+                                        <i class="bi bi-people-fill"></i>
+                                        <input type="number" id="capacidad" th:field="*{capacidad}" class="form-control" 
+                                               min="1" placeholder="Número de personas" required />
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese una capacidad válida.
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Ubicación -->
+                                    <div class="mb-4 input-icon">
+                                        <label for="ubicacion" class="form-label">Ubicación</label>
+                                        <i class="bi bi-geo-alt"></i>
+                                        <input type="text" id="ubicacion" th:field="*{ubicacion}" class="form-control" 
+                                               placeholder="Ej: Terraza, Interior, Barra" required />
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese la ubicación.
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Estado -->
+                                    <div class="mb-4 input-icon">
+                                        <label for="estado" class="form-label">Estado</label>
+                                        <i class="bi bi-info-circle"></i>
+                                        <select id="estado" th:field="*{estado}" class="form-select" required>
+                                            <option value="">Seleccione un estado</option>
+                                            <option value="DISPONIBLE">Disponible</option>
+                                            <option value="OCUPADA">Ocupada</option>
+                                            <option value="INACTIVA">Inactiva</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor seleccione un estado.
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botones -->
+                                    <div class="d-flex justify-content-between align-items-center mt-5 form-actions">
+                                        <a th:href="@{/mesas}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-1"></i>Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-submit text-white">
+                                            <i class="bi bi-save me-1"></i> Guardar Mesa
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="~{fragments/footer :: footer}" class="footer mt-auto py-3 bg-light"></footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+        // Validación de formulario
+        (function() {
+            'use strict';
+            
+            var forms = document.querySelectorAll('.needs-validation');
+            
+            Array.prototype.slice.call(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+        
+        // Validar número positivo
+        document.getElementById('numero')?.addEventListener('input', function(e) {
+            if (this.value && parseInt(this.value) < 1) {
+                this.value = 1;
+            }
+        });
+        
+        // Validar capacidad positiva
+        document.getElementById('capacidad')?.addEventListener('input', function(e) {
+            if (this.value && parseInt(this.value) < 1) {
+                this.value = 1;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Pedido - Sistema de Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .card-body {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .text-purple {
+            color: #7C3AED !important;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding-bottom: 60px;
+        }
+        
+        .form-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: none;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .form-card-header {
+            background: linear-gradient(135deg, #7C3AED 0%, #B983FF 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        
+        .product-table th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .product-row {
+            transition: all 0.2s ease;
+        }
+        
+        .product-row:hover {
+            background-color: rgba(0, 98, 230, 0.03);
+        }
+        
+        .btn-add-product {
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+        
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .total-row {
+            font-weight: 600;
+            background-color: #f8f9fa;
+        }
+        
+        .currency-input {
+            max-width: 150px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-card {
+                border-radius: 0;
+            }
+            
+            .table-responsive {
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+            }
+        }
+        
+        .alert-warning-custom {
+            background-color: #fff3cd;
+            border-color: #ffecb5;
+            color: #664d03;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.7rem;
+            margin-left: 0.3rem;
+        }
+
+        .form-control, .form-select, .input-group {
+            margin-bottom: 1.1rem;
+            padding-left: 0.8rem;
+            padding-right: 0.8rem;
+        }
+
+        .input-group .form-control {
+            margin-bottom: 0;
+        }
+
+        .row.g-3 > [class^="col-"], .row.g-3 > [class*=" col-"] {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="main-content">
+        <div class="container py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Header -->
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                        <div>
+                            <h2 class="mb-1 fw-bold text-purple"><i class="bi bi-cart-plus me-2"></i>Nuevo Pedido</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- Alertas -->
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
+                    <div th:if="${!cajaAbierta}" class="alert alert-warning-custom alert-dismissible fade show animate__animated animate__shakeX" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>¡Atención!</strong> No hay una caja abierta. No es posible registrar pedidos.
+                    </div>
+                    
+                    <!-- Formulario -->
+                    <form th:action="@{/pedidos/guardar}" method="post" id="pedidoForm">
+                        <fieldset th:disabled="${!cajaAbierta}">
+                        
+                        <!-- Información del Pedido -->
+                        <div class="form-card mb-4">
+                            <div class="form-card-header d-flex justify-content-between align-items-center">
+                                <h5 class="form-card-title"><i class="bi bi-info-circle me-2"></i>Información del Pedido</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label for="tipo" class="form-label">Tipo de Pedido *</label>
+                                        <select class="form-select" id="tipo" name="tipo" required style="max-width: 100%; min-width: 120px; width: 100%;">
+                                            <option value="" disabled selected>Seleccione un tipo...</option>
+                                            <option th:each="tipo : ${tiposPedido}" 
+                                                    th:value="${tipo}" 
+                                                    th:text="${tipo}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4" id="mesaContainer" style="display: none;">
+                                        <label for="mesa" class="form-label">Mesa *</label>
+                                        <select class="form-select" id="mesa" name="mesa" style="max-width: 100%; min-width: 120px; width: 100%;">
+                                            <option value="" disabled selected>Seleccione una mesa...</option>
+                                            <option th:each="mesa : ${mesasDisponibles}" 
+                                                    th:value="${mesa.id}" 
+                                                    th:text="'Mesa #' + ${mesa.numero} + ' (' + ${mesa.capacidad} + ' personas)'"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="recargo" class="form-label">Recargo (opcional)</label>
+                                        <div class="input-group currency-input">
+                                            <span class="input-group-text">S/</span>
+                                            <input type="number" step="0.01" min="0" class="form-control" 
+                                                   id="recargo" name="recargo" value="0.00" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="observaciones" class="form-label">Observaciones (Opcional)</label>
+                                        <div style="max-width: 600px;">
+                                            <textarea class="form-control" id="observaciones" name="observaciones" 
+                                                      rows="2" maxlength="500" placeholder="Ingrese observaciones adicionales..." style="resize: vertical;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Productos -->
+                        <div class="form-card mb-4">
+                            <div class="form-card-header d-flex justify-content-between align-items-center">
+                                <h5 class="form-card-title"><i class="bi bi-box-seam me-2"></i>Productos</h5>
+                                <button type="button" class="btn btn-light btn-add-product" id="agregarProducto">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar Producto
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table product-table" id="productosTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto *</th>
+                                                <th style="width: 120px;">Cantidad *</th>
+                                                <th style="width: 120px;">P. Unitario</th>
+                                                <th style="width: 120px;">Subtotal</th>
+                                                <th style="width: 60px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Fila de plantilla (oculta) -->
+                                            <tr class="producto-row" id="productoRowTemplate" style="display: none;">
+                                                <td>
+                                                    <select class="form-select producto-select" required disabled>
+                                                        <option value="" disabled selected>Seleccione producto...</option>
+                                                        <option th:each="producto : ${productos}" 
+                                                                th:value="${producto.id}" 
+                                                                th:text="${producto.nombre} + ' (S/' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ')'"
+                                                                th:data-precio="${producto.precio}"></option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="number" min="1" class="form-control cantidad" value="1" required disabled>
+                                                </td>
+                                                <td class="precio-unitario text-end">S/0.00</td>
+                                                <td class="subtotal text-end">S/0.00</td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-action eliminar-producto" disabled>
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="total-row">
+                                                <td colspan="3" class="text-end fw-bold">Total del Pedido:</td>
+                                                <td id="totalPedido" class="text-end fw-bold">S/0.00</td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-end gap-3">
+                            <button type="submit" class="btn btn-primary px-4" id="btnGuardar">
+                                <i class="bi bi-check-circle me-1"></i> Guardar Pedido
+                            </button>
+                            <a th:href="@{/pedidos}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle me-1"></i> Cancelar
+                            </a>
+                        </div>
+                        
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar/ocultar selector de mesa según tipo de pedido
+            const tipoSelect = document.getElementById('tipo');
+            const mesaContainer = document.getElementById('mesaContainer');
+            const mesaSelect = document.getElementById('mesa');
+            
+            tipoSelect.addEventListener('change', function() {
+                if (this.value === 'MESA') {
+                    mesaContainer.style.display = 'block';
+                    mesaSelect.required = true;
+                } else {
+                    mesaContainer.style.display = 'none';
+                    mesaSelect.required = false;
+                    mesaSelect.value = '';
+                }
+            });
+            
+            // Agregar nueva fila de producto
+            const agregarBtn = document.getElementById('agregarProducto');
+            const productosTable = document.getElementById('productosTable');
+            const tbody = productosTable.querySelector('tbody');
+            const templateRow = document.getElementById('productoRowTemplate');
+            
+            agregarBtn.addEventListener('click', function() {
+                const newRow = templateRow.cloneNode(true);
+                newRow.style.display = '';
+                newRow.removeAttribute('id');
+                
+                // Habilitar campos y asignar nombres
+                const select = newRow.querySelector('.producto-select');
+                select.disabled = false;
+                select.name = 'productos[]';
+                
+                const cantidadInput = newRow.querySelector('.cantidad');
+                cantidadInput.disabled = false;
+                cantidadInput.name = 'cantidades[]';
+                
+                const eliminarBtn = newRow.querySelector('.eliminar-producto');
+                eliminarBtn.disabled = false;
+                
+                tbody.appendChild(newRow);
+                setupProductRow(newRow);
+                
+                // Desplazar vista a la nueva fila
+                newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+            
+            // Configurar eventos para fila de producto
+            function setupProductRow(row) {
+                const productoSelect = row.querySelector('.producto-select');
+                const cantidadInput = row.querySelector('.cantidad');
+                const precioUnitarioCell = row.querySelector('.precio-unitario');
+                const subtotalCell = row.querySelector('.subtotal');
+                const eliminarBtn = row.querySelector('.eliminar-producto');
+
+                function updatePrices() {
+                    const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+                    const precio = selectedOption ? parseFloat(selectedOption.dataset.precio) || 0 : 0;
+                    const cantidad = parseInt(cantidadInput.value) || 1;
+                    
+                    if (cantidad < 1) cantidadInput.value = 1;
+                    
+                    const subtotal = precio * cantidad;
+
+                    precioUnitarioCell.textContent = 'S/' + precio.toFixed(2);
+                    subtotalCell.textContent = 'S/' + subtotal.toFixed(2);
+                    updateTotal();
+                }
+
+                productoSelect.addEventListener('change', updatePrices);
+                cantidadInput.addEventListener('input', updatePrices);
+                cantidadInput.addEventListener('blur', function() {
+                    if (this.value < 1) this.value = 1;
+                    updatePrices();
+                });
+
+                eliminarBtn.addEventListener('click', function() {
+                    row.remove();
+                    updateTotal();
+                });
+
+                updatePrices();
+            }
+            
+            // Calcular total general
+            function updateTotal() {
+                let total = 0;
+                document.querySelectorAll('.subtotal').forEach(cell => {
+                    total += parseFloat(cell.textContent.replace('S/', '')) || 0;
+                });
+                
+                const recargo = parseFloat(document.getElementById('recargo').value) || 0;
+                total += recargo;
+                
+                document.getElementById('totalPedido').textContent = 'S/' + total.toFixed(2);
+            }
+            
+            const recargoInput = document.getElementById('recargo');
+            recargoInput.addEventListener('input', updateTotal);
+            recargoInput.addEventListener('focus', function(e) {
+                const val = this.value.replace(',', '.').trim();
+                if (val === '0' || val === '0.0' || val === '0.00' || val === '' || val === '0,0' || val === '0,00') {
+                    this.value = '';
+                }
+            });
+            
+            // Validación antes de enviar
+            document.getElementById('pedidoForm').addEventListener('submit', function(e) {
+                const productosRows = document.querySelectorAll('.producto-row:not([style*="display: none"])');
+                
+                if (productosRows.length === 0) {
+                    e.preventDefault();
+                    alert('Debe agregar al menos un producto al pedido.');
+                    return false;
+                }
+                
+                let hasErrors = false;
+                productosRows.forEach(row => {
+                    const select = row.querySelector('.producto-select');
+                    if (!select.value) {
+                        select.classList.add('is-invalid');
+                        hasErrors = true;
+                    } else {
+                        select.classList.remove('is-invalid');
+                    }
+                });
+                
+                if (hasErrors) {
+                    e.preventDefault();
+                    alert('Debe seleccionar un producto en todas las filas agregadas.');
+                    return false;
+                }
+                
+                // Eliminar filas de plantilla antes de enviar
+                const filasPlantilla = document.querySelectorAll('.producto-row[style*="display: none"]');
+                filasPlantilla.forEach(fila => fila.remove());
+                
+                return true;
+            });
+            
+            // Deshabilitar botón guardar si no hay caja abierta
+            if (!document.getElementById('pedidoForm').disabled) {
+                document.getElementById('btnGuardar').disabled = false;
+            } else {
+                document.getElementById('btnGuardar').disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

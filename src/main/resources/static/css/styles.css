@@ -1,0 +1,8 @@
+/* Centrado de ícono y texto en el botón de crear pedido */
+.btn-crear-pedido {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	font-size: 1.2em;
+}

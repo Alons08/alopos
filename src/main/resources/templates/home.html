@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Sistema de Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding-bottom: 60px; /* Espacio para el footer */
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-banner {
+            border-left: 5px solid #0d6efd;
+            background-color: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            .card-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Fragment -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container py-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0 fw-bold text-primary">Panel Principal</h2>
+                        <small class="text-muted" th:text="'Hoy es ' + ${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></small>
+                    </div>
+                    
+                    <!-- Welcome Message -->
+                    <div sec:authorize="hasAuthority('ADMIN')" class="alert welcome-banner alert-dismissible fade show">
+                        <i class="bi bi-person-badge me-2"></i> Bienvenido <strong>Administrador</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
+                    <div sec:authorize="hasAuthority('SECRETARIA')" class="alert welcome-banner alert-dismissible fade show">
+                        <i class="bi bi-person-lines-fill me-2"></i> Bienvenido <strong>Secretaria</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cards Section -->
+            <div class="row g-4">
+                <!-- Nuevo Pedido Card -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-start border-5 border-primary">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-cart-plus card-icon text-primary"></i>
+                            <h4 class="card-title mb-3">Nuevo Pedido</h4>
+                            <p class="card-text text-muted mb-4">Registrar un nuevo pedido para mesa, local o delivery</p>
+                            <a th:href="@{/pedidos/nuevo}" class="btn btn-primary px-4 rounded-pill">
+                                <i class="bi bi-plus-circle me-2"></i>Crear Pedido
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pedidos Activos Card -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-start border-5 border-success">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-list-check card-icon text-success"></i>
+                            <h4 class="card-title mb-3">Pedidos Activos</h4>
+                            <p class="card-text text-muted mb-4">Ver y gestionar pedidos en proceso</p>
+                            <a th:href="@{/pedidos}" class="btn btn-success px-4 rounded-pill">
+                                <i class="bi bi-eye me-2"></i>Ver Pedidos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Caja Card (Solo Admin) -->
+                <div sec:authorize="hasAuthority('ADMIN')" class="col-lg-4 col-md-6">
+                    <div th:if="${cajaAbierta}" class="card h-100 border-start border-5 border-warning">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-cash-coin card-icon text-warning"></i>
+                            <h4 class="card-title mb-3">Caja Abierta</h4>
+                            <p class="card-text text-muted mb-2">Monto inicial:</p>
+                            <h5 class="text-warning mb-4">S/ <span th:text="${#numbers.formatDecimal(cajaAbierta.montoApertura, 1, 2)}"></span></h5>
+                            <a th:href="@{/caja/cerrar}" class="btn btn-warning px-4 rounded-pill">
+                                <i class="bi bi-lock me-2"></i>Cerrar Caja
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div th:unless="${cajaAbierta}" class="card h-100 border-start border-5 border-danger">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-cash-coin card-icon text-danger"></i>
+                            <h4 class="card-title mb-3">Caja Cerrada</h4>
+                            <p class="card-text text-muted mb-4">No hay caja abierta en este momento</p>
+                            <a th:href="@{/caja/abrir}" class="btn btn-danger px-4 rounded-pill">
+                                <i class="bi bi-unlock me-2"></i>Abrir Caja
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

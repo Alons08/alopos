@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${usuarioForm.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding-bottom: 60px;
+        }
+        
+        .form-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .form-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color) !important;
+            color: white;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 144, 220, 0.25);
+        }
+        
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            margin-top: 0.1em;
+        }
+        
+        .form-check-label {
+            margin-left: 0.3em;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-cancel {
+            padding: 0.75rem;
+            transition: all 0.3s;
+        }
+        
+        .role-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .role-item {
+            background-color: #f8f9fa;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .role-item.disabled {
+            background-color: #e9ecef;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .form-control {
+                padding: 0.65rem 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 1.25rem;
+            }
+            
+            .role-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .role-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <div class="main-content">
+        <div class="container py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="card form-card animate__animated animate__fadeIn">
+                        <div class="card-header">
+                            <h5 class="card-title" th:text="${usuarioForm.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="${usuarioForm.id == null} ? @{/admin/usuarios/guardar} : @{/admin/usuarios/actualizar}" method="post">
+                                <input type="hidden" name="id" th:value="${usuarioForm.id}" />
+                                
+                                <!-- Nombre -->
+                                <div class="mb-4">
+                                    <label for="nombre" class="form-label">Nombre y Apellido</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" 
+                                           th:value="${usuarioForm.nombre}" required placeholder="Ingrese nombre completo">
+                                </div>
+                                
+                                <!-- Username -->
+                                <div class="mb-4">
+                                    <label for="username" class="form-label">Nombre de usuario</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           th:value="${usuarioForm.username}" required placeholder="Ingrese nombre de usuario">
+                                </div>
+                                
+                                <!-- Contraseña -->
+                                <div class="mb-4" th:if="${usuarioForm.id == null}">
+                                    <label for="password" class="form-label">Contraseña</label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           minlength="4" required placeholder="Ingrese contraseña">
+                                    <small class="text-muted">Mínimo 4 caracteres</small>
+                                </div>
+                                
+                                <!-- Nueva contraseña (solo para edición) -->
+                                <div class="mb-4" th:if="${usuarioForm.id != null}">
+                                    <label for="password" class="form-label">Nueva contraseña</label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           minlength="4" placeholder="Dejar en blanco para no cambiar">
+                                    <small class="text-muted">Dejar en blanco para mantener la contraseña actual</small>
+                                </div>
+                                
+                                <!-- Roles -->
+                                <div class="mb-4">
+                                    <label class="form-label">Roles</label>
+                                    <div class="role-container">
+                                        <div th:each="rol : ${roles}" class="role-item" 
+                                             th:classappend="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'} ? 'disabled' : ''">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   th:id="${'rol_' + rol.id}" name="rolesIds" th:value="${rol.id}"
+                                                   th:checked="${usuarioForm.roles.contains(rol)}" 
+                                                   th:disabled="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'}">
+                                            <label class="form-check-label" th:for="${'rol_' + rol.id}" th:text="${rol.nombre}"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones -->
+                                <div class="d-grid gap-3 mt-4">
+                                    <button type="submit" class="btn btn-submit text-white">
+                                        <i class="bi bi-save me-2"></i> 
+                                        <span th:text="${usuarioForm.id == null ? 'Crear Usuario' : 'Actualizar Usuario'}"></span>
+                                    </button>
+                                    <a th:href="@{/admin/usuarios}" class="btn btn-cancel btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-2"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validación adicional si es necesaria
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                // Puedes agregar validaciones adicionales aquí
+            });
+        });
+    </script>
+</body>
+</html>

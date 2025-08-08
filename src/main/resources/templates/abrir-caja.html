@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abrir Caja - Sistema de Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --success-color: #1cc88a;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --text-dark: #5a5c69;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--secondary-color);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .caja-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #224abe 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .alert-warning-custom {
+            background-color: rgba(246, 194, 62, 0.1);
+            border-left: 4px solid var(--warning-color);
+            color: var(--text-dark);
+        }
+        
+        .alert-danger-custom {
+            background-color: rgba(231, 74, 59, 0.1);
+            border-left: 4px solid var(--danger-color);
+            color: var(--text-dark);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            border-radius: 0 8px 8px 0 !important;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d3e2;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #224abe;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-secondary-custom {
+            padding: 0.75rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-secondary-custom:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <main class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
+                    <div class="caja-card card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-cash-stack me-3" style="font-size: 1.5rem;"></i>
+                                <h5 class="mb-0">Apertura de Caja</h5>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- Alertas -->
+                            <div th:if="${error}" class="alert alert-danger-custom alert-dismissible fade show mb-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <span th:text="${error}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            
+                            <div th:if="${cajaAbierta}" class="alert alert-warning-custom mb-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h6 class="alert-heading mb-1">¡Caja ya abierta!</h6>
+                                        <p class="mb-0">Ya hay una caja abierta hoy. No es posible abrir otra.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Formulario -->
+                            <form th:action="@{/caja/abrir}" method="post">
+                                <!-- Monto de Apertura -->
+                                <div class="mb-4">
+                                    <label for="montoApertura" class="form-label">Monto Inicial de Apertura</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">S/</span>
+                                        <input type="number" step="0.01" min="0" class="form-control" 
+                                               id="montoApertura" name="montoApertura" 
+                                               th:value="${montoApertura}" 
+                                               placeholder="0.00" required
+                                               th:disabled="${cajaAbierta}">
+                                    </div>
+                                    <small class="text-muted">Ingrese el monto inicial en efectivo</small>
+                                </div>
+                                <!-- Botones -->
+                                <div class="d-grid gap-3 mt-4">
+                                    <button type="submit" class="btn btn-primary-custom text-white" th:disabled="${cajaAbierta}">
+                                        <i class="bi bi-cash-coin me-2"></i> Abrir Caja
+                                    </button>
+                                    <a th:href="@{/home}" class="btn btn-outline-secondary-custom">
+                                        <i class="bi bi-arrow-left me-2"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="~{fragments/footer :: footer}" class="footer mt-auto py-3 bg-light"></footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validar que el monto no sea negativo
+        const montoInput = document.getElementById('montoApertura');
+        if (montoInput) {
+            montoInput.addEventListener('input', function(e) {
+                if (this.value && parseFloat(this.value) < 0) {
+                    this.value = 0;
+                }
+            });
+            montoInput.addEventListener('focus', function(e) {
+                const val = this.value.replace(',', '.').trim();
+                if (val === '0' || val === '0.0' || val === '0.00' || val === '' || val === '0,0' || val === '0,00') {
+                    this.value = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
