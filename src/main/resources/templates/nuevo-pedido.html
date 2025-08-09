@@ -86,14 +86,221 @@
             max-width: 150px;
         }
         
+        /* Estilos para el modal de búsqueda */
+        .search-product-card {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .search-product-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .search-product-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .product-price {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .search-input-group {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            padding-left: 1rem;
+        }
+        
+        /* Estilos mejorados para el select + botón de búsqueda */
+        .product-select-container {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        
+        .product-select {
+            flex: 1;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+        
+        .btn-search-product {
+            width: 40px;
+            padding: 0;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 38px;
+            max-height: 100%;
+        }
+        
+        /* Estilos mejorados para móviles */
         @media (max-width: 768px) {
+            .container {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
             .form-card {
-                border-radius: 0;
+                border-radius: 8px;
+            }
+            
+            .form-card-header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .form-card-title {
+                font-size: 1.1rem;
             }
             
             .table-responsive {
                 border: 1px solid #dee2e6;
                 border-radius: 8px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .product-table {
+                min-width: 600px;
+            }
+            
+            .product-table th, 
+            .product-table td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .product-select-container {
+                flex-direction: row;
+            }
+            
+            .btn-add-product {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .btn-action {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+            
+            .form-label {
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .form-control, .form-select, .input-group {
+                font-size: 0.95rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .d-flex.justify-content-end.gap-3 {
+                flex-direction: column;
+                gap: 0.75rem !important;
+            }
+            
+            .d-flex.justify-content-end.gap-3 .btn {
+                width: 100%;
+            }
+            
+            /* Modal en móviles mejorado */
+            .modal-dialog {
+                margin: 0 auto;
+                max-width: 95vw;
+                width: 95vw;
+                min-width: unset;
+                min-height: unset;
+                height: 50vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-content {
+                border-radius: 16px;
+                min-height: unset;
+                height: 50vh;
+                max-height: 50vh;
+                width: 100%;
+                margin: 0 auto;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .modal-header, .modal-footer {
+                padding: 0.8rem;
+            }
+            
+            .modal-body {
+                padding: 0.8rem;
+            }
+            
+            .search-product-item {
+                padding: 0.6rem;
+                font-size: 0.95rem;
+            }
+            
+            .product-name, .product-price {
+                font-size: 0.95rem;
+            }
+            
+            .search-input {
+                font-size: 0.95rem;
+                padding: 0.5rem 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding-bottom: 20px;
+            }
+            
+            .container.py-4 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            h2.mb-1.fw-bold {
+                font-size: 1.5rem;
+            }
+            
+            .row.g-3 > [class^="col-"], 
+            .row.g-3 > [class*=" col-"] {
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+            
+            .currency-input {
+                max-width: 100%;
+            }
+            
+            textarea.form-control {
+                max-width: 100% !important;
+            }
+            
+            .alert {
+                font-size: 0.9rem;
+                padding: 0.75rem;
             }
         }
         
@@ -214,8 +421,8 @@
                                             <tr>
                                                 <th>Producto *</th>
                                                 <th style="width: 120px;">Cantidad *</th>
-                                                <th style="width: 120px;">P. Unitario</th>
-                                                <th style="width: 120px;">Subtotal</th>
+                                                <th style="width: 120px; text-align: right;" class="text-end">P. Unitario</th>
+                                                <th style="width: 120px; text-align: right;" class="text-end">Subtotal</th>
                                                 <th style="width: 60px;"></th>
                                             </tr>
                                         </thead>
@@ -223,13 +430,18 @@
                                             <!-- Fila de plantilla (oculta) -->
                                             <tr class="producto-row" id="productoRowTemplate" style="display: none;">
                                                 <td>
-                                                    <select class="form-select producto-select" required disabled>
-                                                        <option value="" disabled selected>Seleccione producto...</option>
-                                                        <option th:each="producto : ${productos}" 
-                                                                th:value="${producto.id}" 
-                                                                th:text="${producto.nombre} + ' (S/' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ')'"
-                                                                th:data-precio="${producto.precio}"></option>
-                                                    </select>
+                                                    <div class="product-select-container">
+                                                        <select class="form-select product-select" required disabled>
+                                                            <option value="" disabled selected>Seleccione producto...</option>
+                                                            <option th:each="producto : ${productos}" 
+                                                                    th:value="${producto.id}" 
+                                                                    th:text="${producto.nombre} + ' (S/' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ')'"
+                                                                    th:data-precio="${producto.precio}"></option>
+                                                        </select>
+                                                        <button type="button" class="btn btn-outline-secondary btn-search-product">
+                                                            <i class="bi bi-search"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <input type="number" min="1" class="form-control cantidad" value="1" required disabled>
@@ -271,6 +483,42 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal de búsqueda de productos -->
+    <div class="modal fade" id="searchProductModal" tabindex="-1" aria-labelledby="searchProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md" style="max-width: 520px; display: flex; align-items: center; min-height: 100vh;">
+            <div class="modal-content" style="font-size: 0.97rem; width: 100%;">
+                <div class="modal-header" style="padding: 0.7rem 1rem;">
+                    <h6 class="modal-title" id="searchProductModalLabel" style="font-size: 1.05rem;">
+                        <i class="bi bi-search me-2"></i>Buscar Producto
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 0.7rem 1rem;">
+                    <div class="search-input-group" style="margin-bottom: 0.7rem;">
+                        <input type="text" class="form-control search-input" id="productSearchInput" 
+                               placeholder="Buscar producto por nombre..." autocomplete="off" style="font-size: 0.97rem;">
+                    </div>
+                    <div class="search-results" id="searchResults" style="max-height: 320px; overflow-y: auto;">
+                        <!-- Los resultados se cargarán aquí -->
+                        <div th:each="producto : ${productos}" class="search-product-card" style="margin-bottom: 0.5rem; border: none; padding: 0;">
+                            <div class="search-product-item d-flex justify-content-between align-items-center"
+                                 th:data-id="${producto.id}"
+                                 th:data-precio="${producto.precio}"
+                                 th:data-nombre="${producto.nombre}"
+                                 style="padding: 0.5rem 0.8rem; font-size: 0.97rem; border-bottom: 1px solid #eee;">
+                                <span class="product-name" th:text="${producto.nombre}" style="font-size: 1rem; font-weight: 500;"></span>
+                                <span class="product-price" th:text="'S/' + ${#numbers.formatDecimal(producto.precio, 1, 2)}" style="font-size: 1rem; color: #28a745; font-weight: 500; min-width: 80px; text-align: right;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 0.7rem 1rem;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="font-size: 0.97rem;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div th:replace="~{fragments/footer :: footer}"></div>
     
@@ -293,6 +541,10 @@
                 }
             });
             
+            // Variables para el modal de búsqueda
+            const searchModal = new bootstrap.Modal(document.getElementById('searchProductModal'));
+            let currentSelectElement = null;
+            
             // Agregar nueva fila de producto
             const agregarBtn = document.getElementById('agregarProducto');
             const productosTable = document.getElementById('productosTable');
@@ -305,7 +557,7 @@
                 newRow.removeAttribute('id');
                 
                 // Habilitar campos y asignar nombres
-                const select = newRow.querySelector('.producto-select');
+                const select = newRow.querySelector('.product-select');
                 select.disabled = false;
                 select.name = 'productos[]';
                 
@@ -316,6 +568,9 @@
                 const eliminarBtn = newRow.querySelector('.eliminar-producto');
                 eliminarBtn.disabled = false;
                 
+                const searchBtn = newRow.querySelector('.btn-search-product');
+                searchBtn.disabled = false;
+                
                 tbody.appendChild(newRow);
                 setupProductRow(newRow);
                 
@@ -325,11 +580,12 @@
             
             // Configurar eventos para fila de producto
             function setupProductRow(row) {
-                const productoSelect = row.querySelector('.producto-select');
+                const productoSelect = row.querySelector('.product-select');
                 const cantidadInput = row.querySelector('.cantidad');
                 const precioUnitarioCell = row.querySelector('.precio-unitario');
                 const subtotalCell = row.querySelector('.subtotal');
                 const eliminarBtn = row.querySelector('.eliminar-producto');
+                const searchBtn = row.querySelector('.btn-search-product');
 
                 function updatePrices() {
                     const selectedOption = productoSelect.options[productoSelect.selectedIndex];
@@ -356,9 +612,63 @@
                     row.remove();
                     updateTotal();
                 });
+                
+                // Evento para el botón de búsqueda
+                searchBtn.addEventListener('click', function() {
+                    currentSelectElement = productoSelect;
+                    searchModal.show();
+                });
 
                 updatePrices();
             }
+            
+
+            // Búsqueda de productos
+            const searchInput = document.getElementById('productSearchInput');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.trim().toLowerCase();
+                // Selecciona todos los cards de producto
+                const productCards = document.querySelectorAll('.search-results .search-product-card');
+                productCards.forEach(card => {
+                    const item = card.querySelector('.search-product-item');
+                    let productName = '';
+                    if (item) {
+                        const nameSpan = item.querySelector('.product-name');
+                        if (nameSpan) {
+                            productName = nameSpan.textContent.trim().toLowerCase();
+                        } else if (item.dataset.nombre) {
+                            productName = item.dataset.nombre.trim().toLowerCase();
+                        }
+                    }
+                    if (productName.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Selección de producto desde el modal
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.search-product-item')) {
+                    const item = e.target.closest('.search-product-item');
+                    if (currentSelectElement) {
+                        const productId = item.dataset.id;
+                        // Buscar y seleccionar la opción correspondiente
+                        const options = currentSelectElement.options;
+                        for (let i = 0; i < options.length; i++) {
+                            if (options[i].value === productId) {
+                                currentSelectElement.selectedIndex = i;
+                                break;
+                            }
+                        }
+                        // Disparar evento change para actualizar precios
+                        const event = new Event('change');
+                        currentSelectElement.dispatchEvent(event);
+                        searchModal.hide();
+                    }
+                }
+            });
             
             // Calcular total general
             function updateTotal() {
@@ -394,7 +704,7 @@
                 
                 let hasErrors = false;
                 productosRows.forEach(row => {
-                    const select = row.querySelector('.producto-select');
+                    const select = row.querySelector('.product-select');
                     if (!select.value) {
                         select.classList.add('is-invalid');
                         hasErrors = true;
