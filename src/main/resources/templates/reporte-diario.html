@@ -80,6 +80,17 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        /* Forzar scroll horizontal en móviles */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .table {
+                min-width: 700px;
+            }
+        }
         
         .table thead {
             background-color: var(--secondary-color);
@@ -267,6 +278,7 @@
                                 <th>Total</th>
                                 <th>Estado</th>
                                 <th>Hora</th>
+                                <th>Boleta</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -277,6 +289,11 @@
                                 <td>S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></td>
                                 <td th:text="${pedido.estado}"></td>
                                 <td th:text="${#dates.format(pedido.fechaCompletado, 'HH:mm')}"></td>
+                                <td>
+                                    <a th:href="@{'/pedidos/' + ${pedido.id} + '/comprobante'}" class="btn btn-sm btn-primary" title="Generar Boleta" target="_blank">
+                                        <i class="bi bi-receipt"></i> Boleta
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

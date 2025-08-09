@@ -80,6 +80,17 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        /* Forzar scroll horizontal en móviles para tablas */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .table {
+                min-width: 700px;
+            }
+        }
         
         .table thead {
             background-color: var(--secondary-color);

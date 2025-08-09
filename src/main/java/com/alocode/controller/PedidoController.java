@@ -212,7 +212,7 @@ public class PedidoController {
             Font fontTitle = new Font(Font.HELVETICA, 11, Font.BOLD);
             Font fontNormal = new Font(Font.HELVETICA, 7, Font.NORMAL);
             Font fontBold = new Font(Font.HELVETICA, 7, Font.BOLD);
-            Paragraph nombreEmpresa = new Paragraph("ALO SHOP S.A.C.", fontTitle);
+            Paragraph nombreEmpresa = new Paragraph("ALOPOS S.A.C.", fontTitle);
             nombreEmpresa.setAlignment(Element.ALIGN_CENTER);
             document.add(nombreEmpresa);
             Paragraph ruc = new Paragraph("RUC: 12345678901", fontNormal);
