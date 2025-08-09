@@ -56,7 +56,7 @@ public class WebSecurityConfig {
                 // Se definen las reglas de acceso a las rutas
                 .authorizeHttpRequests(auth -> auth
                         //rutas públicas
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
 
                         //rutas de pedidos y reportes
                         .requestMatchers("/pedidos/**", "/reportes/diario").hasAnyAuthority("SECRETARIA", "ADMIN")
