@@ -105,9 +105,9 @@
             .card-body {
                 padding: 1.5rem;
             }
-            
-            .btn {
-                width: 100%;
+            .d-flex.flex-column.align-items-center.gap-3.mt-4 > .btn,
+            .d-flex.flex-column.align-items-center.gap-3 > .btn {
+                max-width: 80vw !important;
             }
         }
     </style>
@@ -162,10 +162,10 @@
                                 </div>
                                 <!-- Botones -->
                                 <div class="d-flex flex-column align-items-center gap-3 mt-4">
-                                    <button type="submit" class="btn btn-primary-custom text-white px-4 py-2 fw-semibold w-100" style="max-width: 430px;" th:disabled="${cajaAbierta}">
+                                    <button type="submit" class="btn btn-primary-custom text-white px-4 py-2 fw-semibold w-100" style="max-width: 350px;" th:disabled="${cajaAbierta}">
                                         <i class="bi bi-cash-coin me-2"></i> Abrir Caja
                                     </button>
-                                    <a th:href="@{/home}" class="btn btn-secondary text-white px-4 py-2 fw-semibold d-flex align-items-center justify-content-center w-100" style="max-width: 430px;">
+                                    <a th:href="@{/home}" class="btn btn-secondary text-white px-4 py-2 fw-semibold d-flex align-items-center justify-content-center w-100" style="max-width: 350px;">
                                         <i class="bi bi-x-circle me-2"></i> Cancelar
                                     </a>
                                 </div>
