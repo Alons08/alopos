@@ -13,6 +13,7 @@ import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+    
     List<Pedido> findByEstadoIn(List<EstadoPedido> estados);
     
     @Query("SELECT p FROM Pedido p WHERE p.estado = 'PENDIENTE' AND DATE(p.fecha) < CURRENT_DATE")
