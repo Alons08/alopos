@@ -342,7 +342,11 @@
                     <!-- Header -->
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                         <div>
-                            <h2 class="mb-1 fw-bold text-purple"><i class="bi bi-cart-plus me-2"></i>Nuevo Pedido</h2>
+                            <h2 class="mb-1 fw-bold text-purple">
+                                <i class="bi bi-cart-plus me-2"></i>
+                                <span th:if="${pedido.id == null}">Nuevo Pedido</span>
+                                <span th:if="${pedido.id != null}">Editar Pedido</span>
+                            </h2>
                         </div>
                     </div>
                     
@@ -359,7 +363,9 @@
                     </div>
                     
                     <!-- Formulario -->
-                    <form th:action="@{/pedidos/guardar}" method="post" id="pedidoForm">
+                    <form th:action="@{/pedidos/guardar}" th:object="${pedido}" method="post" id="pedidoForm">
+                        <input type="hidden" th:field="*{id}" />
+
                         <fieldset th:disabled="${!cajaAbierta}">
                         
                         <!-- Información del Pedido -->
@@ -370,36 +376,30 @@
                             <div class="card-body">
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-4">
-                                        <label for="tipo" class="form-label">Tipo de Pedido *</label>
-                                        <select class="form-select" id="tipo" name="tipo" required style="max-width: 100%; min-width: 120px; width: 100%;">
-                                            <option value="" disabled selected>Seleccione un tipo...</option>
-                                            <option th:each="tipo : ${tiposPedido}" 
-                                                    th:value="${tipo}" 
-                                                    th:text="${tipo}"></option>
-                                        </select>
+                                            <label for="tipo" class="form-label">Tipo de Pedido *</label>
+                                            <select class="form-select" id="tipo" th:name="tipo" required style="max-width: 100%; min-width: 120px; width: 100%;">
+                                                <option value="" disabled th:selected="${pedido.tipo == null}">Seleccione un tipo...</option>
+                                                <option th:each="tipo : ${tiposPedido}" th:value="${tipo}" th:text="${tipo}" th:selected="${pedido.tipo != null} ? (${tipo} == ${pedido.tipo}) : false"></option>
+                                            </select>
                                     </div>
                                     <div class="col-md-4" id="mesaContainer" style="display: none;">
                                         <label for="mesa" class="form-label">Mesa *</label>
-                                        <select class="form-select" id="mesa" name="mesa" style="max-width: 100%; min-width: 120px; width: 100%;">
-                                            <option value="" disabled selected>Seleccione una mesa...</option>
-                                            <option th:each="mesa : ${mesasDisponibles}" 
-                                                    th:value="${mesa.id}" 
-                                                    th:text="'Mesa #' + ${mesa.numero} + ' (' + ${mesa.capacidad} + ' personas)'"></option>
+                                        <select class="form-select" id="mesa" th:field="*{mesa.id}" style="max-width: 100%; min-width: 120px; width: 100%;">
+                                            <option value="" disabled th:selected="${pedido.mesa == null or pedido.mesa.id == null}">Seleccione una mesa...</option>
+                                            <option th:each="mesa : ${mesasDisponibles}" th:value="${mesa.id}" th:text="'Mesa #' + ${mesa.numero} + ' (' + ${mesa.capacidad} + ' personas)'" th:selected="${pedido.mesa != null and #strings.toString(mesa.id) == #strings.toString(pedido.mesa.id)}"></option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="recargo" class="form-label">Recargo (opcional)</label>
                                         <div class="input-group currency-input">
                                             <span class="input-group-text">S/</span>
-                                            <input type="number" step="0.01" min="0" class="form-control" 
-                                                   id="recargo" name="recargo" value="0.00" placeholder="0.00">
+                                            <input type="number" step="0.01" min="0" class="form-control" id="recargo" th:field="*{recargo}" placeholder="0.00">
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <label for="observaciones" class="form-label">Observaciones (Opcional)</label>
                                         <div style="max-width: 600px;">
-                                            <textarea class="form-control" id="observaciones" name="observaciones" 
-                                                      rows="2" maxlength="500" placeholder="Ingrese observaciones adicionales..." style="resize: vertical;"></textarea>
+                                            <textarea class="form-control" id="observaciones" th:field="*{observaciones}" rows="2" maxlength="500" placeholder="Ingrese observaciones adicionales..." style="resize: vertical;"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -427,6 +427,30 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <!-- Mostrar productos existentes al editar -->
+                                            <tr th:each="detalle, iterStat : *{detalles}" class="producto-row">
+                                                <td>
+                                                    <div class="product-select-container">
+                                                        <select class="form-select product-select" th:name="productos[]" th:field="*{detalles[__${iterStat.index}__].producto.id}" required>
+                                                            <option value="" disabled>Seleccione producto...</option>
+                                                            <option th:each="producto : ${productos}" th:value="${producto.id}" th:text="${producto.nombre} + ' (S/' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ')'" th:data-precio="${producto.precio}" th:selected="${producto.id == detalle.producto.id}"></option>
+                                                        </select>
+                                                        <button type="button" class="btn btn-outline-secondary btn-search-product">
+                                                            <i class="bi bi-search"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="number" min="1" class="form-control cantidad" th:name="cantidades[]" th:field="*{detalles[__${iterStat.index}__].cantidad}" required>
+                                                </td>
+                                                <td class="precio-unitario text-end" th:text="'S/' + ${#numbers.formatDecimal(detalle.producto.precio, 1, 2)}">S/0.00</td>
+                                                <td class="subtotal text-end" th:text="'S/' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}">S/0.00</td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-action eliminar-producto">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                             <!-- Fila de plantilla (oculta) -->
                                             <tr class="producto-row" id="productoRowTemplate" style="display: none;">
                                                 <td>
@@ -530,10 +554,24 @@
             const mesaContainer = document.getElementById('mesaContainer');
             const mesaSelect = document.getElementById('mesa');
             
+            // Mostrar el contenedor de mesa si el tipo ya es MESA al cargar la página (edición)
+            if (tipoSelect.value === 'MESA') {
+                mesaContainer.style.display = 'block';
+                mesaSelect.required = true;
+            } else {
+                mesaContainer.style.display = 'none';
+                mesaSelect.required = false;
+            }
+
             tipoSelect.addEventListener('change', function() {
                 if (this.value === 'MESA') {
                     mesaContainer.style.display = 'block';
                     mesaSelect.required = true;
+                    // Forzar opción vacía solo si es nuevo pedido (no edición)
+                    var idInput = document.querySelector('input[name="id"]');
+                    if (idInput && !idInput.value) {
+                        mesaSelect.value = '';
+                    }
                 } else {
                     mesaContainer.style.display = 'none';
                     mesaSelect.required = false;
@@ -694,35 +732,46 @@
             
             // Validación antes de enviar
             document.getElementById('pedidoForm').addEventListener('submit', function(e) {
-                const productosRows = document.querySelectorAll('.producto-row:not([style*="display: none"])');
-                
+                // Selecciona todas las filas de productos visibles (excluyendo la plantilla)
+                const productosRows = document.querySelectorAll('.producto-row:not([id="productoRowTemplate"])');
+
                 if (productosRows.length === 0) {
                     e.preventDefault();
                     alert('Debe agregar al menos un producto al pedido.');
                     return false;
                 }
-                
+
                 let hasErrors = false;
                 productosRows.forEach(row => {
+                    // Asegura que los campos estén habilitados y tengan el atributo name
                     const select = row.querySelector('.product-select');
-                    if (!select.value) {
-                        select.classList.add('is-invalid');
-                        hasErrors = true;
-                    } else {
-                        select.classList.remove('is-invalid');
+                    const cantidadInput = row.querySelector('.cantidad');
+                    if (select) {
+                        select.disabled = false;
+                        select.setAttribute('name', 'productos[]');
+                        if (!select.value) {
+                            select.classList.add('is-invalid');
+                            hasErrors = true;
+                        } else {
+                            select.classList.remove('is-invalid');
+                        }
+                    }
+                    if (cantidadInput) {
+                        cantidadInput.disabled = false;
+                        cantidadInput.setAttribute('name', 'cantidades[]');
                     }
                 });
-                
+
                 if (hasErrors) {
                     e.preventDefault();
                     alert('Debe seleccionar un producto en todas las filas agregadas.');
                     return false;
                 }
-                
-                // Eliminar filas de plantilla antes de enviar
-                const filasPlantilla = document.querySelectorAll('.producto-row[style*="display: none"]');
-                filasPlantilla.forEach(fila => fila.remove());
-                
+
+                // Elimina solo la fila de plantilla (si existe)
+                const filaPlantilla = document.getElementById('productoRowTemplate');
+                if (filaPlantilla) filaPlantilla.remove();
+
                 return true;
             });
             

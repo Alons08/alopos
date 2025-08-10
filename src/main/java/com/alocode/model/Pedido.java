@@ -37,7 +37,7 @@ public class Pedido {
     private Double total;
     
     @Column(nullable = false)
-    private Double recargo;
+    private Double recargo = 0.0;
     
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)

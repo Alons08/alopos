@@ -197,4 +197,57 @@ public class PedidoService {
     public List<Pedido> obtenerPedidosPorCajaYEstado(Long cajaId, EstadoPedido estado) {
         return pedidoRepository.findByCajaIdAndEstado(cajaId, estado);
     }
+
+    @Transactional
+    public void actualizarPedidoYMesas(Pedido pedidoEditado, List<Long> productos, List<Integer> cantidades, Usuario usuario) {
+        Pedido pedidoOriginal = pedidoRepository.findById(pedidoEditado.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+        // Si el tipo era MESA y ahora ya no es, liberar la mesa
+        if (pedidoOriginal.getTipo() == TipoPedido.MESA && pedidoEditado.getTipo() != TipoPedido.MESA) {
+            Long idMesaOriginal = pedidoOriginal.getMesa() != null ? pedidoOriginal.getMesa().getId() : null;
+            if (idMesaOriginal != null) {
+                Mesa mesaOriginal = mesaRepository.findById(idMesaOriginal).orElse(null);
+                if (mesaOriginal != null) {
+                    mesaOriginal.setEstado(EstadoMesa.DISPONIBLE);
+                    mesaRepository.save(mesaOriginal);
+                }
+            }
+        }
+        // Si el tipo era distinto de MESA y ahora es MESA, ocupar la nueva mesa
+        if (pedidoOriginal.getTipo() != TipoPedido.MESA && pedidoEditado.getTipo() == TipoPedido.MESA) {
+            Long idMesaNueva = pedidoEditado.getMesa() != null ? pedidoEditado.getMesa().getId() : null;
+            if (idMesaNueva != null) {
+                Mesa mesaNueva = mesaRepository.findById(idMesaNueva).orElse(null);
+                if (mesaNueva != null) {
+                    mesaNueva.setEstado(EstadoMesa.OCUPADA);
+                    mesaRepository.save(mesaNueva);
+                }
+            }
+        }
+        // Si el tipo es MESA y la mesa cambió, liberar la anterior y ocupar la nueva
+        if (pedidoOriginal.getTipo() == TipoPedido.MESA && pedidoEditado.getTipo() == TipoPedido.MESA) {
+            Long idMesaOriginal = pedidoOriginal.getMesa() != null ? pedidoOriginal.getMesa().getId() : null;
+            Long idMesaNueva = pedidoEditado.getMesa() != null ? pedidoEditado.getMesa().getId() : null;
+            if (idMesaOriginal != null && !idMesaOriginal.equals(idMesaNueva)) {
+                Mesa mesaOriginal = mesaRepository.findById(idMesaOriginal).orElse(null);
+                if (mesaOriginal != null) {
+                    mesaOriginal.setEstado(EstadoMesa.DISPONIBLE);
+                    mesaRepository.save(mesaOriginal);
+                }
+            }
+            if (idMesaNueva != null && !idMesaNueva.equals(idMesaOriginal)) {
+                Mesa mesaNueva = mesaRepository.findById(idMesaNueva).orElse(null);
+                if (mesaNueva != null) {
+                    mesaNueva.setEstado(EstadoMesa.OCUPADA);
+                    mesaRepository.save(mesaNueva);
+                }
+            }
+        }
+        // Actualizar detalles y otros campos
+        pedidoOriginal.setTipo(pedidoEditado.getTipo());
+        pedidoOriginal.setMesa(pedidoEditado.getMesa());
+        pedidoOriginal.setRecargo(pedidoEditado.getRecargo());
+        pedidoOriginal.setObservaciones(pedidoEditado.getObservaciones());
+        actualizarDetallesPedido(pedidoOriginal, productos, cantidades, usuario);
+    }
 }

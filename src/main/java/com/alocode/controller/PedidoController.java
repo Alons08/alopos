@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.alocode.model.DetallePedido;
+import com.alocode.model.Mesa;
 import com.alocode.model.Pedido;
 import com.alocode.model.Producto;
 import com.alocode.model.Usuario;
@@ -51,7 +52,9 @@ public class PedidoController {
     public String mostrarFormularioNuevoPedido(Model model) {
         boolean cajaAbierta = cajaService.obtenerCajaAbiertaHoy().isPresent();
         model.addAttribute("cajaAbierta", cajaAbierta);
-        model.addAttribute("pedido", new Pedido());
+        Pedido pedido = new Pedido();
+        pedido.setMesa(new Mesa()); // Mesa vacía para que mesa.id sea null
+        model.addAttribute("pedido", pedido);
         model.addAttribute("tiposPedido", TipoPedido.values());
         model.addAttribute("mesasDisponibles", mesaService.obtenerMesasDisponibles());
         model.addAttribute("productos", productoService.obtenerProductosActivos());
@@ -81,27 +84,33 @@ public class PedidoController {
                 return "redirect:/pedidos/nuevo";
             }
 
-            // Crear detalles del pedido
-            for (int i = 0; i < productos.size(); i++) {
-                Producto producto = productoService.obtenerProductoPorId(productos.get(i))
-                        .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+            if (pedido.getId() != null) {
+                // Es edición
+                pedidoService.actualizarPedidoYMesas(pedido, productos, cantidades, usuario);
+                redirectAttributes.addFlashAttribute("success", "Pedido actualizado exitosamente");
+            } else {
+                // Es nuevo
+                // Crear detalles del pedido
+                for (int i = 0; i < productos.size(); i++) {
+                    Producto producto = productoService.obtenerProductoPorId(productos.get(i))
+                            .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
-                DetallePedido detalle = new DetallePedido();
-                detalle.setProducto(producto);
-                detalle.setCantidad(cantidades.get(i));
-                detalle.setPrecioUnitario(producto.getPrecio());
-                detalle.setSubtotal(producto.getPrecio() * cantidades.get(i));
-                pedido.getDetalles().add(detalle);
-                System.out.println(
-                        "[LOG] Detalle agregado: Producto=" + producto.getNombre() + ", Cantidad=" + cantidades.get(i));
+                    DetallePedido detalle = new DetallePedido();
+                    detalle.setProducto(producto);
+                    detalle.setCantidad(cantidades.get(i));
+                    detalle.setPrecioUnitario(producto.getPrecio());
+                    detalle.setSubtotal(producto.getPrecio() * cantidades.get(i));
+                    pedido.getDetalles().add(detalle);
+                    System.out.println(
+                            "[LOG] Detalle agregado: Producto=" + producto.getNombre() + ", Cantidad="
+                                    + cantidades.get(i));
+                }
+                if (usuario == null) {
+                    throw new IllegalStateException("No se pudo obtener el usuario autenticado");
+                }
+                pedidoService.crearPedido(pedido, pedido.getDetalles(), usuario);
+                redirectAttributes.addFlashAttribute("success", "Pedido creado exitosamente");
             }
-
-            if (usuario == null) {
-                throw new IllegalStateException("No se pudo obtener el usuario autenticado");
-            }
-            pedidoService.crearPedido(pedido, pedido.getDetalles(), usuario);
-            System.out.println("[LOG] Pedido guardado correctamente");
-            redirectAttributes.addFlashAttribute("success", "Pedido creado exitosamente");
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());
             e.printStackTrace();
@@ -155,44 +164,27 @@ public class PedidoController {
                         redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido PAGADO");
                         return "redirect:/pedidos";
                     }
+                    // Obtener mesas disponibles y agregar la mesa asignada si no está
+                    List<com.alocode.model.Mesa> mesasDisponibles = mesaService.obtenerMesasDisponibles();
+                    if (pedido.getMesa() != null && pedido.getMesa().getId() != null) {
+                        boolean yaIncluida = mesasDisponibles.stream()
+                                .anyMatch(m -> m.getId().equals(pedido.getMesa().getId()));
+                        if (!yaIncluida) {
+                            mesasDisponibles.add(pedido.getMesa());
+                        }
+                    }
                     model.addAttribute("pedido", pedido);
+                    model.addAttribute("tiposPedido", TipoPedido.values());
+                    model.addAttribute("mesasDisponibles", mesasDisponibles);
                     model.addAttribute("productos", productoService.obtenerProductosActivos());
-                    return "editar-pedido";
+                    boolean cajaAbierta = cajaService.obtenerCajaAbiertaHoy().isPresent();
+                    model.addAttribute("cajaAbierta", cajaAbierta);
+                    return "nuevo-pedido";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("error", "Pedido no encontrado");
                     return "redirect:/pedidos";
                 });
-    }
-
-    @PostMapping("/{id}/actualizar")
-    public String actualizarPedido(@PathVariable Long id,
-            @RequestParam List<Long> productos,
-            @RequestParam List<Integer> cantidades,
-            @RequestParam(required = false, defaultValue = "0.0") Double recargo,
-            @RequestParam(required = false) String observaciones,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
-            RedirectAttributes redirectAttributes) {
-        Usuario usuario = null;
-        if (userDetails instanceof MyUserDetails myUserDetails) {
-            usuario = myUserDetails.getUsuario();
-        }
-        try {
-            Pedido pedido = pedidoService.obtenerPedidoPorId(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
-            if (pedido.getEstado() == EstadoPedido.PAGADO) {
-                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido PAGADO");
-                return "redirect:/pedidos";
-            }
-            pedido.setRecargo(recargo != null ? recargo : 0.0);
-            pedido.setObservaciones(observaciones);
-            pedidoService.actualizarDetallesPedido(pedido, productos, cantidades, usuario);
-            redirectAttributes.addFlashAttribute("success", "Pedido actualizado correctamente");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/pedidos/{id}/editar";
-        }
-        return "redirect:/pedidos";
     }
 
     @GetMapping("/{id}/comprobante")
@@ -279,7 +271,6 @@ public class PedidoController {
                     "----------------------------------------------------------------------------------------",
                     fontNormal));
 
-            
             document.add(new Paragraph(" "));
             Paragraph gracias = new Paragraph("¡Gracias por su compra!", fontNormal);
             gracias.setAlignment(Element.ALIGN_CENTER);
