@@ -27,20 +27,41 @@ public class CajaService {
     @Transactional
     public Caja abrirCaja(Double montoApertura, Usuario usuario) {
         Date fechaActual = new Date();
-        
+
         // Verificar si ya hay una caja abierta hoy
         if (cajaRepository.findByFechaAndEstado(fechaActual, EstadoCaja.ABIERTA).isPresent()) {
             throw new IllegalStateException("Ya hay una caja abierta hoy");
         }
-        
+
+        // Buscar si existe alguna caja ABIERTA de días anteriores y cerrarla automáticamente
+        Optional<Caja> cajaAbiertaAnterior = cajaRepository.findAll().stream()
+            .filter(c -> c.getEstado() == EstadoCaja.ABIERTA && !esMismoDia(c.getFecha(), fechaActual))
+            .findFirst();
+        cajaAbiertaAnterior.ifPresent(caja -> {
+            caja.setEstado(EstadoCaja.CERRADA);
+            caja.setHoraCierre(new Date());
+            cajaRepository.save(caja);
+        });
+
         Caja caja = new Caja();
         caja.setFecha(fechaActual);
         caja.setMontoApertura(montoApertura);
         caja.setEstado(EstadoCaja.ABIERTA);
         caja.setUsuario(usuario);
         caja.setHoraApertura(fechaActual);
-        
+
         return cajaRepository.save(caja);
+    }
+
+    // Método utilitario para comparar si dos fechas son el mismo día (ignorando hora)
+    private boolean esMismoDia(Date fecha1, Date fecha2) {
+        if (fecha1 == null || fecha2 == null) return false;
+        java.util.Calendar cal1 = java.util.Calendar.getInstance();
+        java.util.Calendar cal2 = java.util.Calendar.getInstance();
+        cal1.setTime(fecha1);
+        cal2.setTime(fecha2);
+        return cal1.get(java.util.Calendar.YEAR) == cal2.get(java.util.Calendar.YEAR)
+            && cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR);
     }
     
     @Transactional

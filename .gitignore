@@ -33,7 +33,12 @@ build/
 .vscode/
 
 
+
+
 ### IGNORAR ESTOS ARCHIVOS ###
 .env
 /target
 src/main/java/com/alocode/config/DataInitializer.java
+
+### EN ESTE ARCHIVO ESTAN LOS PASOS PARA EL HORARIO DE PERU EN RENDER ###
+IMPORTANTE_TIMEZONE_RENDER.md
