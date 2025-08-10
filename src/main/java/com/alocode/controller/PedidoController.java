@@ -229,7 +229,7 @@ public class PedidoController {
 
             // --- DATOS DE FECHA Y ATENCIÓN ---
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            document.add(new Paragraph("Fecha y Hora: " + sdf.format(pedido.getFecha()), fontNormal));
+            document.add(new Paragraph("Fecha y Hora: " + sdf.format(pedido.getFechaPagado()), fontNormal));
             if (pedido.getMesa() != null) {
                 document.add(new Paragraph("Mesa: " + pedido.getMesa().getNumero(), fontNormal));
             }
