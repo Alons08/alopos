@@ -31,22 +31,22 @@ public class PedidoController {
     private final ProductoService productoService;
     private final MesaService mesaService;
     private final CajaService cajaService;
-    
-    public PedidoController(PedidoService pedidoService, ProductoService productoService, 
-                          MesaService mesaService, CajaService cajaService) {
+
+    public PedidoController(PedidoService pedidoService, ProductoService productoService,
+            MesaService mesaService, CajaService cajaService) {
         this.pedidoService = pedidoService;
         this.productoService = productoService;
         this.mesaService = mesaService;
         this.cajaService = cajaService;
     }
-    
+
     @GetMapping
     public String listarPedidos(Model model) {
         List<Pedido> pedidos = pedidoService.obtenerPedidosPendientes();
         model.addAttribute("pedidos", pedidos);
         return "pedidos";
     }
-    
+
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevoPedido(Model model) {
         boolean cajaAbierta = cajaService.obtenerCajaAbiertaHoy().isPresent();
@@ -57,13 +57,13 @@ public class PedidoController {
         model.addAttribute("productos", productoService.obtenerProductosActivos());
         return "nuevo-pedido";
     }
-    
+
     @PostMapping("/guardar")
     public String guardarPedido(@ModelAttribute Pedido pedido,
-                               @RequestParam List<Long> productos,
-                               @RequestParam List<Integer> cantidades,
-                               @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
-                               RedirectAttributes redirectAttributes) {
+            @RequestParam List<Long> productos,
+            @RequestParam List<Integer> cantidades,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
         System.out.println("--- [LOG] Guardar Pedido ---");
         System.out.println("Pedido recibido: " + pedido);
         System.out.println("Productos: " + productos);
@@ -92,7 +92,8 @@ public class PedidoController {
                 detalle.setPrecioUnitario(producto.getPrecio());
                 detalle.setSubtotal(producto.getPrecio() * cantidades.get(i));
                 pedido.getDetalles().add(detalle);
-                System.out.println("[LOG] Detalle agregado: Producto=" + producto.getNombre() + ", Cantidad=" + cantidades.get(i));
+                System.out.println(
+                        "[LOG] Detalle agregado: Producto=" + producto.getNombre() + ", Cantidad=" + cantidades.get(i));
             }
 
             if (usuario == null) {
@@ -109,12 +110,12 @@ public class PedidoController {
         }
         return "redirect:/pedidos";
     }
-    
+
     @PostMapping("/{id}/estado")
     public String cambiarEstadoPedido(@PathVariable Long id,
-                                     @RequestParam EstadoPedido estado,
-                                     @AuthenticationPrincipal UserDetails userDetails,
-                                     RedirectAttributes redirectAttributes) {
+            @RequestParam EstadoPedido estado,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
         Usuario usuario = null;
         if (userDetails instanceof MyUserDetails myUserDetails) {
             usuario = myUserDetails.getUsuario();
@@ -131,7 +132,7 @@ public class PedidoController {
         }
         return "redirect:/pedidos";
     }
-    
+
     @GetMapping("/{id}/detalle")
     public String verDetallePedido(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return pedidoService.obtenerPedidoPorId(id)
@@ -145,8 +146,9 @@ public class PedidoController {
                 });
     }
 
-       @GetMapping("/{id}/editar")
-    public String mostrarFormularioEditarPedido(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/{id}/editar")
+    public String mostrarFormularioEditarPedido(@PathVariable Long id, Model model,
+            RedirectAttributes redirectAttributes) {
         return pedidoService.obtenerPedidoPorId(id)
                 .map(pedido -> {
                     if (pedido.getEstado() == EstadoPedido.PAGADO) {
@@ -165,18 +167,19 @@ public class PedidoController {
 
     @PostMapping("/{id}/actualizar")
     public String actualizarPedido(@PathVariable Long id,
-                                   @RequestParam List<Long> productos,
-                                   @RequestParam List<Integer> cantidades,
-                                   @RequestParam(required = false, defaultValue = "0.0") Double recargo,
-                                   @RequestParam(required = false) String observaciones,
-                                   @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
-                                   RedirectAttributes redirectAttributes) {
+            @RequestParam List<Long> productos,
+            @RequestParam List<Integer> cantidades,
+            @RequestParam(required = false, defaultValue = "0.0") Double recargo,
+            @RequestParam(required = false) String observaciones,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
         Usuario usuario = null;
         if (userDetails instanceof MyUserDetails myUserDetails) {
             usuario = myUserDetails.getUsuario();
         }
         try {
-            Pedido pedido = pedidoService.obtenerPedidoPorId(id).orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+            Pedido pedido = pedidoService.obtenerPedidoPorId(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
             if (pedido.getEstado() == EstadoPedido.PAGADO) {
                 redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido PAGADO");
                 return "redirect:/pedidos";
@@ -221,12 +224,16 @@ public class PedidoController {
             Paragraph direccion = new Paragraph("Av. Ficticia 123 - Lima, Perú", fontNormal);
             direccion.setAlignment(Element.ALIGN_CENTER);
             document.add(direccion);
-            document.add(new Paragraph("----------------------------------------------------------------------------------------", fontNormal));
+            document.add(new Paragraph(
+                    "----------------------------------------------------------------------------------------",
+                    fontNormal));
             Paragraph tipoDoc = new Paragraph("BOLETA DE VENTA ELECTRÓNICA", fontBold);
             tipoDoc.setAlignment(Element.ALIGN_CENTER);
             document.add(tipoDoc);
             document.add(new Paragraph("N°: B001-" + String.format("%06d", pedido.getId()), fontBold));
-            document.add(new Paragraph("----------------------------------------------------------------------------------------", fontNormal));
+            document.add(new Paragraph(
+                    "----------------------------------------------------------------------------------------",
+                    fontNormal));
 
             // --- DATOS DE FECHA Y ATENCIÓN ---
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -234,13 +241,16 @@ public class PedidoController {
             if (pedido.getMesa() != null) {
                 document.add(new Paragraph("Mesa: " + pedido.getMesa().getNumero(), fontNormal));
             }
-            document.add(new Paragraph("Atiende: " + (pedido.getUsuario() != null ? pedido.getUsuario().getNombre() : "-"), fontNormal));
-            document.add(new Paragraph("----------------------------------------------------------------------------------------", fontNormal));
+            document.add(new Paragraph(
+                    "Atiende: " + (pedido.getUsuario() != null ? pedido.getUsuario().getNombre() : "-"), fontNormal));
+            document.add(new Paragraph(
+                    "----------------------------------------------------------------------------------------",
+                    fontNormal));
 
             // --- TABLA DE PRODUCTOS ---
             PdfPTable table = new PdfPTable(4);
             table.setWidthPercentage(100);
-            table.setWidths(new float[]{2, 8, 3, 4});
+            table.setWidths(new float[] { 2, 8, 3, 4 });
             table.addCell(new Phrase("Cant", fontBold));
             table.addCell(new Phrase("Descripción", fontBold));
             table.addCell(new Phrase("P.U.", fontBold));
@@ -254,7 +264,9 @@ public class PedidoController {
                 subtotal += det.getSubtotal();
             }
             document.add(table);
-            document.add(new Paragraph("----------------------------------------------------------------------------------------", fontNormal));
+            document.add(new Paragraph(
+                    "----------------------------------------------------------------------------------------",
+                    fontNormal));
 
             // --- TOTALES ---
             double igv = subtotal * 0.18;
@@ -263,13 +275,11 @@ public class PedidoController {
             document.add(new Paragraph(String.format("IGV (18%%):     S/ %.2f", igv), fontNormal));
             document.add(new Paragraph(String.format("RECARGO:    S/ %.2f", pedido.getRecargo()), fontNormal));
             document.add(new Paragraph(String.format("TOTAL:          S/ %.2f", pedido.getTotal()), fontBold));
-            document.add(new Paragraph("----------------------------------------------------------------------------------------", fontNormal));
+            document.add(new Paragraph(
+                    "----------------------------------------------------------------------------------------",
+                    fontNormal));
 
-            // --- OBSERVACIONES ---
-            if (pedido.getObservaciones() != null && !pedido.getObservaciones().isEmpty()) {
-                document.add(new Paragraph("Obs: " + pedido.getObservaciones(), fontNormal));
-            }
-
+            
             document.add(new Paragraph(" "));
             Paragraph gracias = new Paragraph("¡Gracias por su compra!", fontNormal);
             gracias.setAlignment(Element.ALIGN_CENTER);
@@ -278,6 +288,5 @@ public class PedidoController {
             document.close();
         }
     }
-
 
 }
