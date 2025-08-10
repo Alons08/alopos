@@ -11,6 +11,7 @@ import com.alocode.model.enums.EstadoCaja;
 import com.alocode.model.enums.EstadoPedido;
 import com.alocode.repository.CajaRepository;
 import com.alocode.repository.PedidoRepository;
+import com.alocode.repository.MesaRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class CajaService {
     private final CajaRepository cajaRepository;
     private final PedidoRepository pedidoRepository;
+    private final MesaRepository mesaRepository;
     
     @Transactional
     public Caja abrirCaja(Double montoApertura, Usuario usuario) {
@@ -51,7 +53,7 @@ public class CajaService {
         }
         
         // Calcular total de ventas
-        List<Pedido> pedidos = pedidoRepository.findByCajaIdAndEstado(idCaja, EstadoPedido.COMPLETADO);
+        List<Pedido> pedidos = pedidoRepository.findByCajaIdAndEstado(idCaja, EstadoPedido.PAGADO);
         double totalVentas = pedidos.stream().mapToDouble(p -> p.getTotal() - p.getRecargo()).sum();
         double totalRecargos = pedidos.stream().mapToDouble(Pedido::getRecargo).sum();
         double totalNeto = totalVentas + totalRecargos;
@@ -60,9 +62,16 @@ public class CajaService {
         caja.setEstado(EstadoCaja.CERRADA);
         caja.setHoraCierre(new Date());
         
-        // Cancelar pedidos pendientes
+        // Cancelar pedidos pendientes y liberar mesas si corresponde
         List<Pedido> pedidosPendientes = pedidoRepository.findPedidosPendientesPorCaja(idCaja);
-        pedidosPendientes.forEach(p -> p.setEstado(EstadoPedido.CANCELADO));
+        pedidosPendientes.forEach(p -> {
+            p.setEstado(EstadoPedido.CANCELADO);
+            // Liberar mesa si es pedido de mesa y tiene mesa asignada
+            if (p.getTipo() != null && p.getTipo().name().equals("MESA") && p.getMesa() != null) {
+                p.getMesa().setEstado(com.alocode.model.enums.EstadoMesa.DISPONIBLE);
+                mesaRepository.save(p.getMesa());
+            }
+        });
         pedidoRepository.saveAll(pedidosPendientes);
         
         return cajaRepository.save(caja);

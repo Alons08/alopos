@@ -24,8 +24,8 @@ public class ReporteService {
     
     public ReporteDiario generarReporteDiario(LocalDateTime fecha) {
         LocalDateTime fin = fecha.plusDays(1);
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaCompletadoBetween(
-            EstadoPedido.COMPLETADO,
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+            EstadoPedido.PAGADO,
             fecha,
             fin
         );
@@ -61,8 +61,8 @@ public class ReporteService {
             new java.util.Date(java.sql.Timestamp.valueOf(fin).getTime())
         );
 
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaCompletadoBetween(
-            EstadoPedido.COMPLETADO,
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+            EstadoPedido.PAGADO,
             inicio,
             fin
         );
@@ -81,8 +81,8 @@ public class ReporteService {
     }
     
     public ReporteMensual generarReporteMensual(LocalDateTime inicio, LocalDateTime fin) {
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaCompletadoBetween(
-            EstadoPedido.COMPLETADO,
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+            EstadoPedido.PAGADO,
             inicio,
             fin
         );
@@ -102,7 +102,7 @@ public class ReporteService {
             // Filtrar pedidos de la semana SOLO dentro del mes
             List<Pedido> pedidosSemana = pedidos.stream()
                 .filter(p -> {
-                    Date fechaPedidoDate = p.getFechaCompletado();
+                    Date fechaPedidoDate = p.getFechaPagado();
                     if (fechaPedidoDate == null) return false;
                     LocalDateTime fechaPedido = fechaPedidoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                     return (fechaPedido.isEqual(semanaInicioFinal) || fechaPedido.isAfter(semanaInicioFinal)) && fechaPedido.isBefore(semanaFinFinal.plusDays(1));

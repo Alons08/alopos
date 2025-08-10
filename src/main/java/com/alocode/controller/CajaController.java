@@ -1,7 +1,10 @@
 package com.alocode.controller;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +39,7 @@ public class CajaController {
     @PostMapping("/abrir")
 
     public String abrirCaja(@RequestParam Double montoApertura,
-                            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails,
+                            @AuthenticationPrincipal UserDetails userDetails,
                             RedirectAttributes redirectAttributes) {
         try {
             com.alocode.model.Usuario usuario = null;
@@ -63,10 +66,10 @@ public class CajaController {
         model.addAttribute("mensajeSinCaja", "No hay una caja abierta para hoy. No es posible cerrar caja.");
         return "cerrar-caja";
     }
-    java.util.Optional<Caja> cajaOpt = cajaService.obtenerCajaAbiertaHoy();
+    Optional<Caja> cajaOpt = cajaService.obtenerCajaAbiertaHoy();
     Caja caja = cajaOpt.get();
-    // Obtener solo los pedidos COMPLETADOS de la caja actual
-    List<Pedido> pedidos = pedidoService.obtenerPedidosPorCajaYEstado(caja.getId(), EstadoPedido.COMPLETADO);
+    // Obtener solo los pedidos PAGADOS de la caja actual
+    List<Pedido> pedidos = pedidoService.obtenerPedidosPorCajaYEstado(caja.getId(), EstadoPedido.PAGADO);
     double totalVentas = pedidos.stream()
         .mapToDouble(p -> p.getTotal() - p.getRecargo())
         .sum();

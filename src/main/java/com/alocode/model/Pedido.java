@@ -51,20 +51,20 @@ public class Pedido {
     private String observaciones;
     
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaCompletado;
+    private Date fechaPagado;
     
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> detalles = new java.util.ArrayList<>();
     
     @ManyToOne
-    @JoinColumn(name = "usuario_completado_id")
-    private Usuario usuarioCompletado;
+    @JoinColumn(name = "usuario_pagado_id")
+    private Usuario usuarioPagado;
 
-    public Usuario getUsuarioCompletado() {
-        return usuarioCompletado;
+    public Usuario getUsuarioPagado() {
+        return usuarioPagado;
     }
 
-    public void setUsuarioCompletado(Usuario usuarioCompletado) {
-        this.usuarioCompletado = usuarioCompletado;
+    public void setUsuarioPagado(Usuario usuarioPagado) {
+        this.usuarioPagado = usuarioPagado;
     }
 }

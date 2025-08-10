@@ -288,7 +288,7 @@
                                 <td th:text="${pedido.mesa != null} ? ${pedido.mesa.numero} : 'N/A'"></td>
                                 <td>S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></td>
                                 <td th:text="${pedido.estado}"></td>
-                                <td th:text="${#dates.format(pedido.fechaCompletado, 'HH:mm')}"></td>
+                                <td th:text="${#dates.format(pedido.fechaPagado, 'HH:mm')}"></td>
                                 <td>
                                     <a th:href="@{'/pedidos/' + ${pedido.id} + '/comprobante'}" class="btn btn-sm btn-primary" title="Generar Boleta" target="_blank">
                                         <i class="bi bi-receipt"></i> Boleta

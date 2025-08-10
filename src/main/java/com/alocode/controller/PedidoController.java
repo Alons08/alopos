@@ -149,8 +149,8 @@ public class PedidoController {
     public String mostrarFormularioEditarPedido(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return pedidoService.obtenerPedidoPorId(id)
                 .map(pedido -> {
-                    if (pedido.getEstado() == EstadoPedido.COMPLETADO) {
-                        redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido COMPLETADO");
+                    if (pedido.getEstado() == EstadoPedido.PAGADO) {
+                        redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido PAGADO");
                         return "redirect:/pedidos";
                     }
                     model.addAttribute("pedido", pedido);
@@ -177,8 +177,8 @@ public class PedidoController {
         }
         try {
             Pedido pedido = pedidoService.obtenerPedidoPorId(id).orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
-            if (pedido.getEstado() == EstadoPedido.COMPLETADO) {
-                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido COMPLETADO");
+            if (pedido.getEstado() == EstadoPedido.PAGADO) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar un pedido PAGADO");
                 return "redirect:/pedidos";
             }
             pedido.setRecargo(recargo != null ? recargo : 0.0);

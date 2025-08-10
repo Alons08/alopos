@@ -246,7 +246,7 @@
                                                         <i class="bi bi-eye"></i>
                                                     </a>
                                                     
-                                                    <a th:if="${pedido.estado.name() != 'COMPLETADO' && pedido.estado.name() != 'CANCELADO'}"
+                                                    <a th:if="${pedido.estado.name() != 'PAGADO' && pedido.estado.name() != 'CANCELADO'}"
                                                        th:href="@{/pedidos/{id}/editar(id=${pedido.id})}"
                                                        class="action-btn btn btn-outline-warning"
                                                        title="Editar Pedido"
@@ -274,21 +274,21 @@
                                                             </li>
                                                             <li th:if="${pedido.estado.name() == 'PREPARANDO'}">
                                                                 <form th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post">
-                                                                    <input type="hidden" name="estado" value="LISTO">
+                                                                    <input type="hidden" name="estado" value="ENTREGANDO">
                                                                     <button type="submit" class="dropdown-item">
-                                                                        <i class="bi bi-check-circle me-2 text-warning"></i>Marcar como Listo
+                                                                        <i class="bi bi-check-circle me-2 text-warning"></i>Marcar como Entregando
                                                                     </button>
                                                                 </form>
                                                             </li>
-                                                            <li th:if="${pedido.estado.name() != 'COMPLETADO' && pedido.estado.name() != 'CANCELADO'}">
+                                                            <li th:if="${pedido.estado.name() != 'PAGADO' && pedido.estado.name() != 'CANCELADO'}">
                                                                 <form th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post">
-                                                                    <input type="hidden" name="estado" value="COMPLETADO">
+                                                                    <input type="hidden" name="estado" value="PAGADO">
                                                                     <button type="submit" class="dropdown-item">
-                                                                        <i class="bi bi-check-circle-fill me-2 text-success"></i>Completar Pedido
+                                                                        <i class="bi bi-check-circle-fill me-2 text-success"></i>Finalizar Pedido
                                                                     </button>
                                                                 </form>
                                                             </li>
-                                                            <li th:if="${pedido.estado.name() != 'COMPLETADO' && pedido.estado.name() != 'CANCELADO'}">
+                                                            <li th:if="${pedido.estado.name() != 'PAGADO' && pedido.estado.name() != 'CANCELADO'}">
                                                                 <form th:action="@{/pedidos/{id}/estado(id=${pedido.id})}" method="post">
                                                                     <input type="hidden" name="estado" value="CANCELADO">
                                                                     <button type="submit" class="dropdown-item">

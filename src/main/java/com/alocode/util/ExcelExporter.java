@@ -69,7 +69,7 @@ public class ExcelExporter {
                 
                 // Cabecera de pedidos
                 String[] pedidosHeaders = {
-                    "ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Observaciones", "Fecha Completado"
+                    "ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Observaciones", "Fecha Pagado"
                 };
                 rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
                 
@@ -93,7 +93,7 @@ public class ExcelExporter {
                     addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
-                    addCell(row, colIdx++, p.getFechaCompletado() != null ? p.getFechaCompletado() : null, dateStyle);
+                    addCell(row, colIdx++, p.getFechaPagado() != null ? p.getFechaPagado() : null, dateStyle);
                     
                     // Detalles del pedido
                     if (p.getDetalles() != null && !p.getDetalles().isEmpty()) {

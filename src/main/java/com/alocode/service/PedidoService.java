@@ -83,14 +83,14 @@ public class PedidoService {
                 .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
 
         // Validar transición de estado
-        if (pedido.getEstado() != EstadoPedido.PENDIENTE &&
-                pedido.getEstado() != EstadoPedido.PREPARANDO &&
-                pedido.getEstado() != EstadoPedido.LISTO) {
-            throw new IllegalStateException("No se puede cambiar el estado de un pedido completado o cancelado");
+    if (pedido.getEstado() != EstadoPedido.PENDIENTE &&
+        pedido.getEstado() != EstadoPedido.PREPARANDO &&
+        pedido.getEstado() != EstadoPedido.ENTREGANDO) {
+            throw new IllegalStateException("No se puede cambiar el estado de un pedido pagado o cancelado");
         }
 
         // Procesar cambio de estado
-        if (nuevoEstado == EstadoPedido.COMPLETADO) {
+    if (nuevoEstado == EstadoPedido.PAGADO) {
             // Liberar stock ocupado y descontar stock real
             for (DetallePedido detalle : pedido.getDetalles()) {
                 Producto producto = detalle.getProducto();
@@ -106,8 +106,8 @@ public class PedidoService {
                 mesaRepository.save(mesa);
             }
 
-            pedido.setFechaCompletado(new Date());
-            pedido.setUsuarioCompletado(usuario);
+            pedido.setFechaPagado(new Date());
+            pedido.setUsuarioPagado(usuario);
         } else if (nuevoEstado == EstadoPedido.CANCELADO) {
             // Solo liberar stock ocupado
             for (DetallePedido detalle : pedido.getDetalles()) {
@@ -144,14 +144,14 @@ public class PedidoService {
     }
 
     public List<Pedido> obtenerPedidosPendientes() {
-        return pedidoRepository.findByEstadoIn(List.of(
-                EstadoPedido.PENDIENTE,
-                EstadoPedido.PREPARANDO,
-                EstadoPedido.LISTO));
+    return pedidoRepository.findByEstadoIn(List.of(
+        EstadoPedido.PENDIENTE,
+        EstadoPedido.PREPARANDO,
+        EstadoPedido.ENTREGANDO));
     }
 
-    public List<Pedido> obtenerPedidosCompletados() {
-        return pedidoRepository.findByEstadoIn(List.of(EstadoPedido.COMPLETADO));
+    public List<Pedido> obtenerPedidosPagados() {
+        return pedidoRepository.findByEstadoIn(List.of(EstadoPedido.PAGADO));
     }
 
     public Optional<Pedido> obtenerPedidoPorId(Long id) {
@@ -161,8 +161,8 @@ public class PedidoService {
     @Transactional
     public void actualizarDetallesPedido(Pedido pedido, List<Long> productos, List<Integer> cantidades,
             Usuario usuario) {
-        if (pedido.getEstado() == EstadoPedido.COMPLETADO) {
-            throw new IllegalStateException("No se puede editar un pedido COMPLETADO");
+        if (pedido.getEstado() == EstadoPedido.PAGADO) {
+            throw new IllegalStateException("No se puede editar un pedido PAGADO");
         }
         // Liberar stock ocupado de los productos actuales
         for (DetallePedido detalle : pedido.getDetalles()) {
