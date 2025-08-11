@@ -17,16 +17,14 @@ import com.alocode.model.enums.EstadoPedido;
 import com.alocode.service.CajaService;
 import com.alocode.service.PedidoService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/caja")
+@RequiredArgsConstructor
 public class CajaController {
     private final CajaService cajaService;
     private final PedidoService pedidoService;
-
-    public CajaController(CajaService cajaService, PedidoService pedidoService) {
-        this.cajaService = cajaService;
-        this.pedidoService = pedidoService;
-    }
 
     @GetMapping("/abrir")
     public String mostrarFormularioAbrirCaja(Model model) {

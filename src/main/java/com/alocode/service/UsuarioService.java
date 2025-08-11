@@ -3,9 +3,11 @@ package com.alocode.service;
 import com.alocode.model.Usuario;
 import com.alocode.model.Rol;
 import com.alocode.repository.UsuarioRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import com.alocode.repository.RolRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -14,13 +16,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private RolRepository rolRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Listar todos los usuarios
     public List<Usuario> findAll() {
@@ -83,9 +83,6 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
     }
-
-    // ...otros métodos existentes...
-    // (campos finales eliminados, ya están arriba)
 
     public boolean verificarPassword(Usuario usuario, String passwordActual) {
         return passwordEncoder.matches(passwordActual, usuario.getPassword());

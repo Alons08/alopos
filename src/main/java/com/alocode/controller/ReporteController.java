@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import com.alocode.service.ReporteService;
 import java.time.LocalDate;
@@ -17,12 +18,9 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/reportes")
+@RequiredArgsConstructor
 public class ReporteController {
     private final ReporteService reporteService;
-    
-    public ReporteController(ReporteService reporteService) {
-        this.reporteService = reporteService;
-    }
     
     @GetMapping("/diario")
     public String reporteDiario(@RequestParam(value = "fecha", required = false) String fecha, Model model) {

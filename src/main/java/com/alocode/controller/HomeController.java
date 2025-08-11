@@ -1,19 +1,20 @@
 package com.alocode.controller;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.alocode.service.CajaService;
 import com.alocode.service.MyUserDetails;
+
+import lombok.RequiredArgsConstructor;
+
 import com.alocode.model.Usuario;
 
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
-    @Autowired
-    private CajaService cajaService;
+    private final CajaService cajaService;
 
     @GetMapping({"/", "/home"})
     public String home(Model model, @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {

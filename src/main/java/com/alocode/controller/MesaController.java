@@ -9,15 +9,13 @@ import com.alocode.model.Mesa;
 import com.alocode.model.enums.EstadoMesa;
 import com.alocode.service.MesaService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/mesas")
+@RequiredArgsConstructor
 public class MesaController {
     private final MesaService mesaService;
-    
-    public MesaController(MesaService mesaService) {
-        this.mesaService = mesaService;
-    }
-    
 
     @GetMapping
     public String listarMesas(@RequestParam(value = "q", required = false) String q, Model model) {

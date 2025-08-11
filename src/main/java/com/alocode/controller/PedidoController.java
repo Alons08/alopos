@@ -20,6 +20,8 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
@@ -27,19 +29,12 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/pedidos")
+@RequiredArgsConstructor
 public class PedidoController {
     private final PedidoService pedidoService;
     private final ProductoService productoService;
     private final MesaService mesaService;
     private final CajaService cajaService;
-
-    public PedidoController(PedidoService pedidoService, ProductoService productoService,
-            MesaService mesaService, CajaService cajaService) {
-        this.pedidoService = pedidoService;
-        this.productoService = productoService;
-        this.mesaService = mesaService;
-        this.cajaService = cajaService;
-    }
 
     @GetMapping
     public String listarPedidos(Model model) {

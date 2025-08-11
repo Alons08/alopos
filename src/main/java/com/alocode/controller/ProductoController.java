@@ -9,16 +9,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.alocode.model.Producto;
 import com.alocode.service.ProductoService;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Controller
 @RequestMapping("/productos")
+@RequiredArgsConstructor
 public class ProductoController {
     private final ProductoService productoService;
-    
-    public ProductoController(ProductoService productoService) {
-        this.productoService = productoService;
-    }
-    
+
     @GetMapping
     public String listarProductos(@RequestParam(value = "q", required = false) String q, Model model) {
         if (q != null && !q.trim().isEmpty()) {
