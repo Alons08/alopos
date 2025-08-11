@@ -201,6 +201,20 @@
                 font-size: 0.9rem;
             }
         }
+        /* Ajuste de tamaño de fuente para el aviso de SECRETARIA en móvil */
+        .aviso-secretaria {
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) {
+            .aviso-secretaria {
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .aviso-secretaria {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -250,7 +264,7 @@
                     </div>
 
                         <!-- Mensaje fijo para SECRETARIA: Aviso de cierre de caja -->
-                        <div sec:authorize="hasAuthority('SECRETARIA')" class="alert alert-warning d-flex align-items-center gap-2 mb-4 shadow-sm flex-wrap" style="font-size:1rem; border-left: 6px solid var(--warning-color); background: linear-gradient(90deg, #fffbe6 80%, #fff3cd 100%);">
+                        <div sec:authorize="hasAuthority('SECRETARIA')" class="alert alert-warning d-flex align-items-center gap-2 mb-4 shadow-sm flex-wrap aviso-secretaria" style="border-left: 6px solid var(--warning-color); background: linear-gradient(90deg, #fffbe6 80%, #fff3cd 100%);">
                             <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.6rem; color: var(--warning-color);"></i>
                             <span class="fw-semibold text-dark">Recuerda:</span>
                             <span class="text-dark">Avise al administrador que no se olvide de <b>cerrar la caja antes de las 12 de la noche</b>.</span>

@@ -782,6 +782,29 @@
                 document.getElementById('btnGuardar').disabled = true;
             }
         });
+    // --- Ajuste para que el modal no sea tapado por el teclado en móviles ---
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchProductModal = document.getElementById('searchProductModal');
+        var productSearchInput = document.getElementById('productSearchInput');
+        if (searchProductModal && productSearchInput) {
+            productSearchInput.addEventListener('focus', function() {
+                setTimeout(function() {
+                    if (window.innerWidth <= 600) {
+                        searchProductModal.querySelector('.modal-dialog').style.alignItems = 'flex-start';
+                        searchProductModal.querySelector('.modal-dialog').style.marginTop = '10px';
+                    }
+                }, 300);
+            });
+            productSearchInput.addEventListener('blur', function() {
+                setTimeout(function() {
+                    if (window.innerWidth <= 600) {
+                        searchProductModal.querySelector('.modal-dialog').style.alignItems = '';
+                        searchProductModal.querySelector('.modal-dialog').style.marginTop = '';
+                    }
+                }, 300);
+            });
+        }
+    });
     </script>
 </body>
 </html>
