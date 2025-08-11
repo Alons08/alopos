@@ -278,7 +278,7 @@
                                 <th>Total</th>
                                 <th>Estado</th>
                                 <th>Hora</th>
-                                <th>Boleta</th>
+                                <th>Comprobante</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -290,8 +290,8 @@
                                 <td th:text="${pedido.estado}"></td>
                                 <td th:text="${#dates.format(pedido.fechaPagado, 'HH:mm')}"></td>
                                 <td>
-                                    <a th:href="@{'/pedidos/' + ${pedido.id} + '/comprobante'}" class="btn btn-sm btn-primary" title="Generar Boleta" target="_blank">
-                                        <i class="bi bi-receipt"></i> Boleta
+                                    <a th:href="@{'/pedidos/' + ${pedido.id} + '/comprobante'}" class="btn btn-sm btn-primary" title="Generar Comprobante" target="_blank">
+                                        <i class="bi bi-receipt"></i> Comprobante
                                     </a>
                                 </td>
                             </tr>

@@ -56,7 +56,7 @@ public class UsuarioAdminController {
 
     @PostMapping("/cambiar-estado/{id}")
     public String cambiarEstado(@PathVariable Long id) {
-        usuarioService.cambiarEstado(id);
+        usuarioService.cambiarEstadoeIntentosFallidos(id);
         return "redirect:/admin/usuarios";
     }
 }

@@ -15,6 +15,8 @@
             --success-color: #66BB6A;
             --warning-color: #FFA726;
             --danger-color: #EF5350;
+            --btn-cambiar-nombre: #9C27B0; /* Morado más intenso */
+            --btn-cambiar-pass: #FF5722; /* Naranja */
             --light-bg: #f8f9fa;
             --dark-text: #2E3440;
             --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
@@ -122,6 +124,26 @@
             border: none;
         }
         
+        #btnCambiarNombre {
+            background-color: var(--btn-cambiar-nombre);
+            color: #fff;
+        }
+
+        #btnCambiarNombre:hover {
+            background-color: #7B1FA2;
+            color: #fff;
+        }
+
+        #btnCambiarPassword {
+            background-color: var(--btn-cambiar-pass);
+            color: #fff;
+        }
+
+        #btnCambiarPassword:hover {
+            background-color: #E64A19;
+            color: #fff;
+        }
+        
         .btn-primary {
             background-color: var(--primary-color);
         }
@@ -139,18 +161,22 @@
             background-color: var(--primary-light);
         }
         
+        .password-container {
+            position: relative;
+        }
+        
         .password-toggle {
             cursor: pointer;
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
+            right: 12px;
+            top: 38px;
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            z-index: 5;
         }
         
         .form-control {
-            padding: 0.5rem 0.75rem;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
             border-radius: 6px;
             border: 1px solid #e9ecef;
             font-size: 0.85rem;
@@ -203,6 +229,11 @@
             
             .form-section h5 {
                 font-size: 0.95rem;
+            }
+            
+            .password-toggle {
+                top: 36px;
+                font-size: 0.9rem;
             }
         }
         
@@ -282,23 +313,23 @@
                             
                             <!-- Action Buttons -->
                             <div class="d-flex profile-actions gap-2 mb-3">
-                                <button class="btn btn-primary btn-profile" id="btnCambiarNombre" type="button">
-                                    <i class="bi bi-pencil-fill"></i> Cambiar nombre
+                                <button class="btn btn-profile" id="btnCambiarNombre" type="button">
+                                    <i class="bi bi-pencil-fill"></i> Cambiar nombre completo
                                 </button>
-                                <button class="btn btn-outline-primary btn-profile" id="btnCambiarPassword" type="button">
+                                <button class="btn btn-profile" id="btnCambiarPassword" type="button">
                                     <i class="bi bi-key-fill"></i> Cambiar contraseña
                                 </button>
                             </div>
                             
                             <!-- Change Name Form -->
                             <div class="form-section" id="formCambiarNombre">
-                                <h5><i class="bi bi-pencil-square"></i>Cambiar nombre</h5>
+                                <h5><i class="bi bi-pencil-square"></i>Cambiar nombre completo</h5>
                                 <form th:action="@{/perfil/actualizar}" method="post">
                                     <div class="mb-3">
-                                        <label for="nombre" class="form-label">Nuevo nombre</label>
+                                        <label for="nombre" class="form-label">Nuevo nombre completo</label>
                                         <input type="text" class="form-control" id="nombre" name="nombre" th:value="${usuario.nombre}" required>
                                     </div>
-                                    <div class="mb-3 position-relative">
+                                    <div class="mb-3 password-container">
                                         <label for="passwordActual" class="form-label">Contraseña actual</label>
                                         <input type="password" class="form-control" id="passwordActual" name="passwordActual" required>
                                         <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('passwordActual')"></i>
@@ -320,18 +351,18 @@
                                 <h5><i class="bi bi-key"></i>Cambiar contraseña</h5>
                                 <form th:action="@{/perfil/actualizar}" method="post">
                                     <input type="hidden" name="nombre" th:value="${usuario.nombre}" />
-                                    <div class="mb-3 position-relative">
+                                    <div class="mb-3 password-container">
                                         <label for="passwordActual2" class="form-label">Contraseña actual</label>
                                         <input type="password" class="form-control" id="passwordActual2" name="passwordActual" required>
                                         <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('passwordActual2')"></i>
                                     </div>
-                                    <div class="mb-3 position-relative">
+                                    <div class="mb-3 password-container">
                                         <label for="nuevaPassword" class="form-label">Nueva contraseña</label>
                                         <input type="password" class="form-control" id="nuevaPassword" name="nuevaPassword" minlength="4" required>
                                         <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('nuevaPassword')"></i>
                                         <div class="form-text">Mínimo 4 caracteres</div>
                                     </div>
-                                    <div class="mb-3 position-relative">
+                                    <div class="mb-3 password-container">
                                         <label for="confirmarPassword" class="form-label">Confirmar nueva contraseña</label>
                                         <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" minlength="4" required>
                                         <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('confirmarPassword')"></i>
@@ -362,7 +393,7 @@
         // Función para alternar visibilidad de contraseña
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const icon = input.nextElementSibling;
+            const icon = input.parentElement.querySelector('.password-toggle');
             
             if (input.type === "password") {
                 input.type = "text";

@@ -1,5 +1,6 @@
 package com.alocode.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,10 @@ import com.alocode.service.impl.UserDetailsServiceImpl;
 @Configuration //esta anotación registra Beans en el contenedor de Spring Boot
 @EnableWebSecurity //habilitar la seguridad en la app y poder usar la BD sin problemas
 public class WebSecurityConfig {
+
+    //SE USA EN EL FILTER CHAIN
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     //Para tener al usuario en la fabrica de Spring
     @Bean
@@ -74,8 +79,14 @@ public class WebSecurityConfig {
                 // Configura el manejo del inicio de sesión en la aplicación.
                 .formLogin(form -> form
                         .loginPage("/login") /*ENNN "WebMvcConfigurer" vinculo el endpoint a un HTML*/
+                        .failureHandler(customAuthenticationFailureHandler) //NUEVOOOOOOOOOOO
                         .defaultSuccessUrl("/home", true) //redirigir al home después del login
                         .permitAll() //permite el acceso al cierre de sesión para todos.
+                )
+                // Limita a una sola sesión activa por usuario
+                .sessionManagement(session -> session
+                    .maximumSessions(1)
+                    .maxSessionsPreventsLogin(false) // Si es true, bloquea el nuevo login; si es false, cierra la sesión anterior
                 )
                 // Configura el manejo del cierre de sesión en la aplicación.
                 .logout(logout -> logout

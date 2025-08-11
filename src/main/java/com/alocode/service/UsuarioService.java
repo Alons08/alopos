@@ -75,10 +75,11 @@ public class UsuarioService {
     }
 
     // Cambiar estado activo/inactivo
-    public void cambiarEstado(Long id) {
+    public void cambiarEstadoeIntentosFallidos(Long id) {
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario != null && !tieneRolAdmin(usuario)) {
             usuario.setActivo(!usuario.getActivo());
+            usuario.setIntentosFallidos(0); // Reinicia los intentos fallidos
             usuarioRepository.save(usuario);
         }
     }

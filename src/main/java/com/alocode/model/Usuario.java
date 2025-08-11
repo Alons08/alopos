@@ -35,6 +35,14 @@ public class Usuario {
     
     private Boolean activo = true;
 
+    // estos 2 atributos que están a continuación funcionan con los 2 "Listeners" y "CustomAuthenticationFailureHandler"
+    @Column(name = "intentos_fallidos")
+    private int intentosFallidos = 0;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_ultimo_intento")
+    private Date fechaUltimoIntento;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_creacion")
