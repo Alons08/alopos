@@ -38,19 +38,17 @@ public class WebSecurityConfig {
         comunmente para autenticar usuarios en BD. Además, es el responsable
          de verificar las credenciales del usuario y autenticar el usuario*/
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
     //Luego de lo de arriba tenemos que registrarlo en el manejador de autenticacion
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity, DaoAuthenticationProvider authenticationProvider) throws Exception {
         AuthenticationManagerBuilder authMB = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
-        //cuando se realiza una solicitud el administrador de autenticacion usara este provider
-        authMB.authenticationProvider(authenticationProvider());
+        authMB.authenticationProvider(authenticationProvider);
         return authMB.build();
     }
 

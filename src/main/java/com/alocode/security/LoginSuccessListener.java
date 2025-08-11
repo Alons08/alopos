@@ -1,6 +1,5 @@
 package com.alocode.security;
 
-import com.alocode.model.Usuario;
 import com.alocode.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
