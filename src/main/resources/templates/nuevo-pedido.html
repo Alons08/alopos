@@ -553,7 +553,7 @@
             const tipoSelect = document.getElementById('tipo');
             const mesaContainer = document.getElementById('mesaContainer');
             const mesaSelect = document.getElementById('mesa');
-            
+
             // Mostrar el contenedor de mesa si el tipo ya es MESA al cargar la página (edición)
             if (tipoSelect.value === 'MESA') {
                 mesaContainer.style.display = 'block';
@@ -578,44 +578,44 @@
                     mesaSelect.value = '';
                 }
             });
-            
+
             // Variables para el modal de búsqueda
             const searchModal = new bootstrap.Modal(document.getElementById('searchProductModal'));
             let currentSelectElement = null;
-            
+
             // Agregar nueva fila de producto
             const agregarBtn = document.getElementById('agregarProducto');
             const productosTable = document.getElementById('productosTable');
             const tbody = productosTable.querySelector('tbody');
             const templateRow = document.getElementById('productoRowTemplate');
-            
+
             agregarBtn.addEventListener('click', function() {
                 const newRow = templateRow.cloneNode(true);
                 newRow.style.display = '';
                 newRow.removeAttribute('id');
-                
+
                 // Habilitar campos y asignar nombres
                 const select = newRow.querySelector('.product-select');
                 select.disabled = false;
                 select.name = 'productos[]';
-                
+
                 const cantidadInput = newRow.querySelector('.cantidad');
                 cantidadInput.disabled = false;
                 cantidadInput.name = 'cantidades[]';
-                
+
                 const eliminarBtn = newRow.querySelector('.eliminar-producto');
                 eliminarBtn.disabled = false;
-                
+
                 const searchBtn = newRow.querySelector('.btn-search-product');
                 searchBtn.disabled = false;
-                
+
                 tbody.appendChild(newRow);
                 setupProductRow(newRow);
-                
+
                 // Desplazar vista a la nueva fila
                 newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
-            
+
             // Configurar eventos para fila de producto
             function setupProductRow(row) {
                 const productoSelect = row.querySelector('.product-select');
@@ -629,9 +629,9 @@
                     const selectedOption = productoSelect.options[productoSelect.selectedIndex];
                     const precio = selectedOption ? parseFloat(selectedOption.dataset.precio) || 0 : 0;
                     const cantidad = parseInt(cantidadInput.value) || 1;
-                    
+
                     if (cantidad < 1) cantidadInput.value = 1;
-                    
+
                     const subtotal = precio * cantidad;
 
                     precioUnitarioCell.textContent = 'S/' + precio.toFixed(2);
@@ -650,7 +650,7 @@
                     row.remove();
                     updateTotal();
                 });
-                
+
                 // Evento para el botón de búsqueda
                 searchBtn.addEventListener('click', function() {
                     currentSelectElement = productoSelect;
@@ -659,7 +659,13 @@
 
                 updatePrices();
             }
-            
+
+            // --- INICIO: NUEVO BLOQUE PARA ACTUALIZAR SUBTOTALES Y TOTAL AL CARGAR ---
+            // Al cargar la página, recorre todas las filas de productos y actualiza los precios
+            document.querySelectorAll('.producto-row:not([id="productoRowTemplate"])').forEach(row => {
+                setupProductRow(row);
+            });
+            // --- FIN BLOQUE ---
 
             // Búsqueda de productos
             const searchInput = document.getElementById('productSearchInput');
@@ -707,20 +713,20 @@
                     }
                 }
             });
-            
+
             // Calcular total general
             function updateTotal() {
                 let total = 0;
                 document.querySelectorAll('.subtotal').forEach(cell => {
                     total += parseFloat(cell.textContent.replace('S/', '')) || 0;
                 });
-                
+
                 const recargo = parseFloat(document.getElementById('recargo').value) || 0;
                 total += recargo;
-                
+
                 document.getElementById('totalPedido').textContent = 'S/' + total.toFixed(2);
             }
-            
+
             const recargoInput = document.getElementById('recargo');
             recargoInput.addEventListener('input', updateTotal);
             recargoInput.addEventListener('focus', function(e) {
@@ -729,7 +735,12 @@
                     this.value = '';
                 }
             });
-            
+
+            // --- INICIO: NUEVO BLOQUE PARA ACTUALIZAR TOTAL AL CARGAR ---
+            // Asegura que el total se actualice al cargar la página (por si hay recargo)
+            updateTotal();
+            // --- FIN BLOQUE ---
+
             // Validación antes de enviar
             document.getElementById('pedidoForm').addEventListener('submit', function(e) {
                 // Selecciona todas las filas de productos visibles (excluyendo la plantilla)
@@ -774,7 +785,7 @@
 
                 return true;
             });
-            
+
             // Deshabilitar botón guardar si no hay caja abierta
             if (!document.getElementById('pedidoForm').disabled) {
                 document.getElementById('btnGuardar').disabled = false;
