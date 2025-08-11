@@ -16,13 +16,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
     List<Pedido> findByEstadoIn(List<EstadoPedido> estados);
     
-    @Query("SELECT p FROM Pedido p WHERE p.estado = 'PENDIENTE' AND DATE(p.fecha) < CURRENT_DATE")
+    @Query("SELECT p FROM Pedido p WHERE p.estado = 'PENDIENTE' AND CAST(p.fecha AS date) < CURRENT_DATE")
     List<Pedido> findPedidosPendientesDeDiasAnteriores();
     
     @Query("SELECT p FROM Pedido p WHERE p.caja.id = :cajaId AND p.estado = 'PENDIENTE'")
     List<Pedido> findPedidosPendientesPorCaja(@Param("cajaId") Long cajaId);
     
-    @Query("SELECT p FROM Pedido p WHERE p.estado = 'PAGADO' AND DATE(p.fechaPagado) BETWEEN :inicio AND :fin")
+    @Query("SELECT p FROM Pedido p WHERE p.estado = 'PAGADO' AND CAST(p.fechaPagado AS date) BETWEEN :inicio AND :fin")
     List<Pedido> findPedidosPagadosEntreFechas(@Param("inicio") Date inicio, @Param("fin") Date fin);
     
     List<Pedido> findByCajaIdAndEstado(Long cajaId, EstadoPedido estado);

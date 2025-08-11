@@ -38,6 +38,14 @@ public class Pedido {
     
     @Column(nullable = false)
     private Double recargo = 0.0;
+
+    public Double getRecargo() {
+        return recargo == null ? 0.0 : recargo;
+    }
+
+    public void setRecargo(Double recargo) {
+        this.recargo = (recargo == null ? 0.0 : recargo);
+    }
     
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
