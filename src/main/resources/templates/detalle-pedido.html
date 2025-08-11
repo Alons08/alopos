@@ -74,8 +74,8 @@
         
         .status-pendiente { background-color: #f8f9fa; color: #6c757d; }
         .status-preparando { background-color: #e7f1ff; color: #0d6efd; }
-    .status-entregando { background-color: #fff3cd; color: #ffc107; }
-    .status-pagado { background-color: #d4edda; color: #28a745; }
+        .status-entregando { background-color: #fff3cd; color: #ffc107; }
+        .status-pagado { background-color: #d4edda; color: #28a745; }
         .status-cancelado { background-color: #f8d7da; color: #dc3545; }
         
         .products-table {
@@ -160,17 +160,6 @@
             color: white;
         }
         
-        .btn-receipt {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-        }
-        
-        .btn-receipt:hover {
-            background-color: #218838;
-            color: white;
-        }
-        
         .dropdown-menu {
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -184,11 +173,22 @@
             gap: 8px;
         }
         
-        @media (max-width: 768px) {
+        /* Mejoras para mobile */
+        @media (max-width: 992px) {
+            .card-detail {
+                margin-bottom: 15px;
+            }
+            
+            .card-header {
+                padding: 12px 15px;
+            }
+            
             .card-body {
                 padding: 15px;
             }
-            
+        }
+        
+        @media (max-width: 768px) {
             .detail-item {
                 flex-direction: column;
                 gap: 4px;
@@ -197,6 +197,7 @@
             
             .detail-label {
                 font-size: 0.9rem;
+                font-weight: 600;
             }
             
             .products-table thead th,
@@ -209,25 +210,53 @@
                 padding: 8px 12px;
                 font-size: 0.9rem;
             }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .action-buttons .dropdown {
+                width: 100%;
+            }
+            
+            .action-buttons .dropdown .btn {
+                width: 100%;
+            }
         }
         
         @media (max-width: 576px) {
             .card-header {
-                padding: 12px 15px;
+                padding: 10px 12px;
             }
             
             .products-table thead th,
             .products-table tbody td {
                 padding: 8px 10px;
+                font-size: 0.85rem;
             }
             
-            .btn-group {
-                width: 100%;
+            .products-table thead th:last-child,
+            .products-table tbody td:last-child {
+                padding-right: 5px;
             }
             
-            .btn-group .btn {
-                flex: 1;
-                justify-content: center;
+            .products-table thead th:first-child,
+            .products-table tbody td:first-child {
+                padding-left: 5px;
+            }
+            
+            .btn-action i {
+                font-size: 0.9rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -239,9 +268,6 @@
         <div class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Detalle del Pedido #<span th:text="${pedido.id}"></span></h2>
-                <a th:href="@{'/pedidos/{id}/comprobante'(id=${pedido.id})}" class="btn btn-receipt btn-action" target="_blank">
-                    <i class="bi bi-receipt"></i> Comprobante
-                </a>
             </div>
             
             <div class="row">
@@ -253,7 +279,8 @@
                         <div class="card-body">
                             <div class="detail-item">
                                 <span class="detail-label">Estado</span>
-                                <span th:text="${pedido.estado}"></span>
+                                <span class="status-badge" th:classappend="'status-' + ${pedido.estado.toString().toLowerCase()}" 
+                                      th:text="${pedido.estado}"></span>
                             </div>
                             
                             <div class="detail-item">
@@ -333,7 +360,7 @@
                 </div>
             </div>
             
-            <div class="d-flex flex-wrap gap-3 mt-4">
+            <div class="d-flex flex-wrap gap-3 mt-4 action-buttons">
                 <a th:if="${pedido.estado.name() != 'PAGADO' && pedido.estado.name() != 'CANCELADO'}"
                    th:href="@{'/pedidos/{id}/editar'(id=${pedido.id})}" 
                    class="btn btn-edit btn-action">
