@@ -258,7 +258,6 @@ public class PedidoController {
 
             // --- TOTALES ---
             double igv = subtotal * 0.18;
-            double total = subtotal + pedido.getRecargo();
             document.add(new Paragraph(String.format("SUBTOTAL:   S/ %.2f", subtotal), fontNormal));
             document.add(new Paragraph(String.format("IGV (18%%):     S/ %.2f", igv), fontNormal));
             document.add(new Paragraph(String.format("RECARGO:    S/ %.2f", pedido.getRecargo()), fontNormal));

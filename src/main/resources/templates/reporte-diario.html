@@ -144,7 +144,7 @@
                 <p class="text-muted mb-0" th:text="${#dates.format(reporte.fecha, 'EEEE, d MMMM yyyy')}"></p>
             </div>
             <div class="col-md-4 d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
-                <a th:href="@{/reportes/exportar/diario}" class="btn btn-success">
+                <a th:href="@{'/reportes/exportar/diario?fecha=' + ${#dates.format(reporte.fecha, 'yyyy-MM-dd')}}" class="btn btn-success">
                     <i class="bi bi-file-excel me-2"></i> Exportar a Excel
                 </a>
             </div>

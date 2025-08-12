@@ -11,6 +11,8 @@ import com.alocode.service.ReporteService;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import com.alocode.util.ExcelExporter;
 
 import java.util.Date;
@@ -96,11 +98,65 @@ public class ReporteController {
     }
     
     @GetMapping("/exportar/diario")
-    public void exportarReporteDiarioExcel(HttpServletResponse response) {
-        Date hoy = new Date();
-        LocalDateTime hoyLdt = hoy.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
-        ReporteService.ReporteDiario reporte = reporteService.generarReporteDiario(hoyLdt);
+    public void exportarReporteDiarioExcel(HttpServletResponse response,
+                                           @RequestParam(value = "fecha", required = false) String fecha) {
+        LocalDate diaDate;
+        if (fecha != null) {
+            diaDate = LocalDate.parse(fecha);
+        } else {
+            Date hoy = new Date();
+            diaDate = hoy.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        LocalDateTime diaLdt = diaDate.atStartOfDay();
+        ReporteService.ReporteDiario reporte = reporteService.generarReporteDiario(diaLdt);
         ExcelExporter.exportToExcel(reporte, "reporte-diario", response);
+    }
+
+    @GetMapping("/exportar/semanal")
+    public void exportarReporteSemanalExcel(HttpServletResponse response,
+                                           @RequestParam(value = "inicio", required = false) String inicio,
+                                           @RequestParam(value = "fin", required = false) String fin) {
+        LocalDate inicioDate;
+        LocalDate finDate;
+        if (inicio != null && fin != null) {
+            inicioDate = LocalDate.parse(inicio);
+            finDate = LocalDate.parse(fin);
+        } else {
+            Date inicioSemana = obtenerInicioSemana();
+            Date finSemana = new Date(inicioSemana.getTime() + 6 * 86400000); // +6 días
+            inicioDate = inicioSemana.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            finDate = finSemana.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        LocalDateTime inicioLdt = inicioDate.atStartOfDay();
+        LocalDateTime finLdt = finDate.atStartOfDay();
+        ReporteService.ReporteSemanal reporte = reporteService.generarReporteSemanal(inicioLdt, finLdt);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String nombreArchivo = "reporte-semanal_" + inicioDate.format(formatter) + "_a_" + finDate.format(formatter);
+        ExcelExporter.exportToExcel(reporte, nombreArchivo, response);
+    }
+
+    @GetMapping("/exportar/mensual")
+    public void exportarReporteMensualExcel(HttpServletResponse response,
+                                           @RequestParam(value = "inicio", required = false) String inicio,
+                                           @RequestParam(value = "fin", required = false) String fin) {
+        LocalDate inicioDate;
+        LocalDate finDate;
+        if (inicio != null && fin != null) {
+            inicioDate = LocalDate.parse(inicio);
+            finDate = LocalDate.parse(fin);
+        } else {
+            Date inicioMes = obtenerInicioMes();
+            Date finMes = obtenerFinMes();
+            inicioDate = inicioMes.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            finDate = finMes.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        LocalDateTime inicioLdt = inicioDate.atStartOfDay();
+        LocalDateTime finLdt = finDate.atStartOfDay();
+        ReporteService.ReporteMensual reporte = reporteService.generarReporteMensual(inicioLdt, finLdt);
+        // Nombre: reporte-mensual_YYYY-MM-01_a_YYYY-MM-<fin>
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String nombreArchivo = "reporte-mensual_" + inicioDate.format(formatter) + "_a_" + finDate.format(formatter);
+        ExcelExporter.exportToExcel(reporte, nombreArchivo, response);
     }
     
     // Métodos auxiliares para calcular fechas

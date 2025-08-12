@@ -18,12 +18,11 @@ public class ExcelExporter {
     private static final short TITLE_FONT_SIZE = 14;
     
     public static void exportToExcel(Object reporte, String nombreArchivo, HttpServletResponse response) {
+        String fechaReporte = "";
         try (Workbook workbook = new XSSFWorkbook()) {
             // Estilos predefinidos
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle titleStyle = createTitleStyle(workbook);
-            CellStyle dataStyle = createDataStyle(workbook);
-            CellStyle currencyStyle = createCurrencyStyle(workbook);
             CellStyle dateStyle = createDateStyle(workbook);
             CellStyle centeredStyle = createCenteredDataStyle(workbook);
             CellStyle centeredCurrencyStyle = createCenteredCurrencyStyle(workbook);
@@ -31,7 +30,11 @@ public class ExcelExporter {
             
             if (reporte instanceof ReporteService.ReporteDiario diario) {
                 Sheet sheet = workbook.createSheet("Reporte Diario");
-                
+                // ...existing code...
+                // Preparar nombre de archivo con fecha (DIA-MES-AÑO)
+                if (diario.getFecha() != null) {
+                    fechaReporte = new SimpleDateFormat("dd-MM-yyyy").format(diario.getFecha());
+                }
                 // Configurar anchos de columnas (en unidades de 1/256 de ancho de carácter)
                 sheet.setColumnWidth(0, 12*256);  // Columna A
                 sheet.setColumnWidth(1, 20*256);  // Columna B
@@ -126,14 +129,177 @@ public class ExcelExporter {
                 }
                 
             } else if (reporte instanceof ReporteService.ReporteSemanal semanal) {
-                // Implementación similar para reporte semanal...
+                Sheet sheet = workbook.createSheet("Reporte Semanal");
+                // Configurar anchos de columnas igual que el diario
+                sheet.setColumnWidth(0, 20*256);  // Fecha y etiquetas generales (más ancho)
+                sheet.setColumnWidth(1, 20*256);  // Monto Apertura
+                sheet.setColumnWidth(2, 20*256);  // Monto Cierre
+                sheet.setColumnWidth(3, 18*256);  // Total Ventas
+                sheet.setColumnWidth(4, 18*256);  // Total Pedidos
+                sheet.setColumnWidth(5, 18*256);  // Estado Caja
+                sheet.setColumnWidth(6, 20*256);  // Columna G (igual que en diario, para observaciones o fechas largas)
+
+                int rowIdx = 0;
+                // Título del reporte
+                Row titleRow = sheet.createRow(rowIdx++);
+                titleRow.setHeightInPoints(25);
+                Cell titleCell = titleRow.createCell(0);
+                titleCell.setCellValue("REPORTE SEMANAL");
+                titleCell.setCellStyle(titleStyle);
+                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
+
+                // Información general (igual que diario)
+                rowIdx = addGeneralInfo(sheet, rowIdx,
+                    new String[] {"Desde", "Hasta", "Total Semanal"},
+                    new Object[] {semanal.getInicio(), semanal.getFin(), semanal.getTotalSemanal()},
+                    headerStyle, centeredStyle, centeredCurrencyStyle, dateStyle);
+
+                // Espacio antes de la tabla de resumen por día
+                rowIdx = addSeparatorRow(sheet, rowIdx, 6, separatorStyle);
+
+                // Cabecera resumen por día
+                String[] headers = {"Fecha", "Monto Apertura", "Monto Cierre", "Total Ventas", "Total Pedidos", "Estado Caja"};
+                rowIdx = createTableHeader(sheet, rowIdx, headers, headerStyle);
+
+                // Filas por cada caja (día)
+                for (com.alocode.model.Caja caja : semanal.getCajas()) {
+                    Row row = sheet.createRow(rowIdx++);
+                    int colIdx = 0;
+                    addCell(row, colIdx++, caja.getFecha(), dateStyle);
+                    addCell(row, colIdx++, caja.getMontoApertura(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, caja.getMontoCierre(), centeredCurrencyStyle);
+                    // Calcular total ventas del día
+                    double totalVentasDia = semanal.getPedidos().stream()
+                        .filter(p -> p.getCaja() != null && p.getCaja().getId().equals(caja.getId()))
+                        .mapToDouble(com.alocode.model.Pedido::getTotal)
+                        .sum();
+                    addCell(row, colIdx++, totalVentasDia, centeredCurrencyStyle);
+                    // Total pedidos del día
+                    long totalPedidosDia = semanal.getPedidos().stream()
+                        .filter(p -> p.getCaja() != null && p.getCaja().getId().equals(caja.getId()))
+                        .count();
+                    addCell(row, colIdx++, totalPedidosDia, centeredStyle);
+                    // Estado caja
+                    String estado = (caja.getMontoCierre() == null) ? "Abierta" : "Cerrada";
+                    addCell(row, colIdx++, estado, centeredStyle);
+                }
+
+                // Espacio antes de la tabla de pedidos
+                rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
+
+                // Cabecera de pedidos
+                String[] pedidosHeaders = {"ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Observaciones", "Fecha Pagado"};
+                rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
+                boolean firstPedido = true;
+                for (Pedido p : semanal.getPedidos()) {
+                    if (!firstPedido) {
+                        rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
+                    }
+                    firstPedido = false;
+                    Row row = sheet.createRow(rowIdx++);
+                    row.setHeightInPoints(20);
+                    int colIdx = 0;
+                    addCell(row, colIdx++, p.getId(), centeredStyle);
+                    addCell(row, colIdx++, p.getMesa() != null ? String.valueOf(p.getMesa().getNumero()) : "", centeredStyle);
+                    addCell(row, colIdx++, p.getUsuario() != null ? p.getUsuario().getNombre() : "", centeredStyle);
+                    addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
+                    addCell(row, colIdx++, p.getFechaPagado() != null ? p.getFechaPagado() : null, dateStyle);
+                }
+
+                // Nombre de archivo con rango de fechas
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                String desde = semanal.getInicio() != null ? sdf.format(semanal.getInicio()) : "";
+                String hasta = semanal.getFin() != null ? sdf.format(semanal.getFin()) : "";
+                // Evitar duplicar el rango de fechas en el nombre del archivo
+                String sufijo = "_" + desde + "_a_" + hasta;
+                if (!desde.isEmpty() && !hasta.isEmpty() && (nombreArchivo == null || !nombreArchivo.endsWith(sufijo))) {
+                    nombreArchivo = nombreArchivo + sufijo;
+                }
             } else if (reporte instanceof ReporteService.ReporteMensual mensual) {
-                // Implementación similar para reporte mensual...
+                Sheet sheet = workbook.createSheet("Reporte Mensual");
+                // Anchos de columnas
+                sheet.setColumnWidth(0, 20*256); // Semana/Fecha
+                sheet.setColumnWidth(1, 20*256); // Periodo
+                sheet.setColumnWidth(2, 18*256); // Total Ventas
+                sheet.setColumnWidth(3, 18*256); // N° Pedidos
+                sheet.setColumnWidth(4, 20*256); // Observaciones/Acciones
+
+                int rowIdx = 0;
+                // Título
+                Row titleRow = sheet.createRow(rowIdx++);
+                titleRow.setHeightInPoints(25);
+                Cell titleCell = titleRow.createCell(0);
+                titleCell.setCellValue("REPORTE MENSUAL");
+                titleCell.setCellStyle(titleStyle);
+                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4));
+
+                // Info general
+                rowIdx = addGeneralInfo(sheet, rowIdx,
+                    new String[] {"Desde", "Hasta", "Total Mensual"},
+                    new Object[] {mensual.getInicio(), mensual.getFin(), mensual.getTotalMensual()},
+                    headerStyle, centeredStyle, centeredCurrencyStyle, dateStyle);
+
+                // Espacio antes de la tabla de resumen semanal
+                rowIdx = addSeparatorRow(sheet, rowIdx, 5, separatorStyle);
+
+                // Cabecera resumen semanal
+                String[] headers = {"Semana", "Periodo", "Total Ventas", "N° Pedidos"};
+                rowIdx = createTableHeader(sheet, rowIdx, headers, headerStyle);
+
+                // Filas por cada semana
+                int semanaNum = 1;
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
+                for (ReporteService.SemanaResumen semana : mensual.getSemanas()) {
+                    Row row = sheet.createRow(rowIdx++);
+                    int colIdx = 0;
+                    addCell(row, colIdx++, "Semana " + semanaNum++, centeredStyle);
+                    String periodo = sdf.format(semana.getInicio()) + " - " + sdf.format(semana.getFin());
+                    addCell(row, colIdx++, periodo, centeredStyle);
+                    addCell(row, colIdx++, semana.getTotalSemana(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, semana.getCantidadPedidos(), centeredStyle);
+                }
+
+                // Espacio antes de la tabla de pedidos
+                rowIdx = addSeparatorRow(sheet, rowIdx, 5, separatorStyle);
+
+                // Cabecera de pedidos
+                String[] pedidosHeaders = {"ID Pedido", "Fecha Pagado", "Total", "Recargo", "Usuario", "Observaciones"};
+                rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
+                for (Pedido p : mensual.getPedidos()) {
+                    Row row = sheet.createRow(rowIdx++);
+                    int colIdx = 0;
+                    addCell(row, colIdx++, p.getId(), centeredStyle);
+                    addCell(row, colIdx++, p.getFechaPagado(), dateStyle);
+                    addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
+                    addCell(row, colIdx++, p.getUsuario() != null ? p.getUsuario().getNombre() : "", centeredStyle);
+                    addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
+                }
+
+                // Nombre de archivo con rango de fechas
+                SimpleDateFormat sdfFile = new SimpleDateFormat("dd-MM-yyyy");
+                String desde = mensual.getInicio() != null ? sdfFile.format(mensual.getInicio()) : "";
+                String hasta = mensual.getFin() != null ? sdfFile.format(mensual.getFin()) : "";
+                String sufijo = "_" + desde + "_a_" + hasta;
+                if (!desde.isEmpty() && !hasta.isEmpty() && (nombreArchivo == null || !nombreArchivo.endsWith(sufijo))) {
+                    nombreArchivo = nombreArchivo + sufijo;
+                }
             }
             
             // Escribir el archivo
-            String fechaHora = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-            String nombreFinal = nombreArchivo + "_" + fechaHora + ".xlsx";
+            String nombreFinal;
+            if (reporte instanceof ReporteService.ReporteDiario && !fechaReporte.isEmpty()) {
+                nombreFinal = nombreArchivo + "_" + fechaReporte + ".xlsx";
+            } else if (reporte instanceof ReporteService.ReporteSemanal || reporte instanceof ReporteService.ReporteMensual) {
+                // Para el reporte semanal y mensual, ya tienen el rango de fechas en nombreArchivo
+                nombreFinal = nombreArchivo + ".xlsx";
+            } else {
+                // Para otros reportes, mantener la fecha y hora
+                String fechaHora = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+                nombreFinal = nombreArchivo + "_" + fechaHora + ".xlsx";
+            }
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment; filename=" + nombreFinal);
             workbook.write(response.getOutputStream());
