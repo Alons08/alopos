@@ -16,7 +16,7 @@ public class MesaService {
     private final MesaRepository mesaRepository;
     
     public List<Mesa> obtenerTodasLasMesas() {
-        return mesaRepository.findAll();
+        return mesaRepository.findAllByOrderByIdAsc();
     }
 
     public List<Mesa> buscarMesas(String q) {

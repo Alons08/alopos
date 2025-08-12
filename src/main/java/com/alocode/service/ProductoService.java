@@ -16,7 +16,7 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
     
     public List<Producto> obtenerTodosLosProductos() {
-        return productoRepository.findAll();
+        return productoRepository.findAllByOrderByIdAsc();
     }
     
     public List<Producto> buscarProductosPorNombre(String nombre) {

@@ -24,7 +24,7 @@ public class UsuarioService {
 
     // Listar todos los usuarios
     public List<Usuario> findAll() {
-        return usuarioRepository.findAll();
+        return usuarioRepository.findAllByOrderByIdAsc();
     }
 
     // Buscar usuario por ID

@@ -25,6 +25,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PedidoService {
+    public List<Pedido> obtenerTodosLosPedidos() {
+        return pedidoRepository.findAllByOrderByIdAsc();
+    }
 
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;

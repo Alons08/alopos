@@ -13,6 +13,7 @@ import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+    java.util.List<Pedido> findAllByOrderByIdAsc();
     
     List<Pedido> findByEstadoIn(List<EstadoPedido> estados);
     

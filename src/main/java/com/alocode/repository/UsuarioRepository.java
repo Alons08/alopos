@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    java.util.List<Usuario> findAllByOrderByIdAsc();
 
     Optional<Usuario> findByUsername(String username);
     

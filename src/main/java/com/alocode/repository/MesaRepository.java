@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
+    java.util.List<Mesa> findAllByOrderByIdAsc();
     List<Mesa> findByEstado(EstadoMesa estado);
     
     @Query("SELECT m FROM Mesa m WHERE m.estado = 'DISPONIBLE' ORDER BY m.numero")

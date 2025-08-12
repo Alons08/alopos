@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    List<Producto> findAllByOrderByIdAsc();
     List<Producto> findByActivoTrue();
     
     Optional<Producto> findByNombreIgnoreCase(String nombre);
