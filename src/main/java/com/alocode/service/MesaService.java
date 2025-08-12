@@ -21,7 +21,7 @@ public class MesaService {
 
     public List<Mesa> buscarMesas(String q) {
         if (q == null || q.trim().isEmpty()) {
-            return mesaRepository.findAll();
+            return mesaRepository.findAllByOrderByIdAsc();
         }
         return mesaRepository.buscarPorNumeroOEstado(q.trim());
     }

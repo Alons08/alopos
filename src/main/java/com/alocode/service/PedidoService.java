@@ -147,10 +147,12 @@ public class PedidoService {
     }
 
     public List<Pedido> obtenerPedidosPendientes() {
-    return pedidoRepository.findByEstadoIn(List.of(
-        EstadoPedido.PENDIENTE,
-        EstadoPedido.PREPARANDO,
-        EstadoPedido.ENTREGANDO));
+        List<Pedido> pedidos = pedidoRepository.findByEstadoIn(List.of(
+            EstadoPedido.PENDIENTE,
+            EstadoPedido.PREPARANDO,
+            EstadoPedido.ENTREGANDO));
+        pedidos.sort(java.util.Comparator.comparingLong(Pedido::getId));
+        return pedidos;
     }
 
     public List<Pedido> obtenerPedidosPagados() {
