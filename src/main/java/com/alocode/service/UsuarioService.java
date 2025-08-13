@@ -10,6 +10,8 @@ import com.alocode.repository.RolRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,7 +53,9 @@ public class UsuarioService {
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         }
         if (rolesIds != null) {
-            Set<Rol> roles = new java.util.HashSet<>(rolRepository.findAllById(rolesIds));
+            Set<Rol> roles = new HashSet<>(rolRepository.findAllById(rolesIds));
+            // Filtrar para que no se pueda asignar el rol ADMIN
+            roles.removeIf(rol -> "ADMIN".equalsIgnoreCase(rol.getNombre()));
             usuario.setRoles(roles);
         }
         usuario.setActivo(true);
@@ -69,6 +73,8 @@ public class UsuarioService {
         }
         if (!tieneRolAdmin(existente) && rolesIds != null) {
             Set<Rol> roles = new java.util.HashSet<>(rolRepository.findAllById(rolesIds));
+            // Filtrar para que no se pueda asignar el rol ADMIN
+            roles.removeIf(rol -> "ADMIN".equalsIgnoreCase(rol.getNombre()));
             existente.setRoles(roles);
         }
         usuarioRepository.save(existente);
