@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.Calendar;
 import java.util.Date;
 
+// Listener que se ejecuta cuando ocurre un fallo de login.
+// Incrementa los intentos fallidos y puede bloquear la cuenta si supera el límite.
+// Se usa para proteger contra ataques de fuerza bruta y bloquear cuentas tras varios intentos fallidos.
 @Component
 public class LoginFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
 
@@ -43,4 +46,5 @@ public class LoginFailureListener implements ApplicationListener<AuthenticationF
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
+    
 }

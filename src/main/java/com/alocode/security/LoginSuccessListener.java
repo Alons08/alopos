@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+// Listener que se ejecuta cuando un usuario inicia sesión correctamente.
+// Reinicia los intentos fallidos y actualiza la fecha del último intento.
+// Se usa para desbloquear cuentas tras un login exitoso.
 @Component
 public class LoginSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
@@ -23,4 +26,5 @@ public class LoginSuccessListener implements ApplicationListener<AuthenticationS
             usuarioRepository.save(usuario);
         });
     }
+    
 }
