@@ -31,13 +31,13 @@ public class LoginController {
                 if (!Boolean.TRUE.equals(usuario.getActivo())) {
                     mensaje = "El usuario está bloqueado. Contacte al administrador.";
                 } else {
-                    mensaje = "Usuario o contraseña incorrectos."; //contraseña incorrecta.
+                    mensaje = "Contraseña incorrecta."; //contraseña incorrecta. /* Usuario o contraseña incorrectos. */
                     if (usuario.getIntentosFallidos() == 3) {
                         advertencia = "¡Atención! Si falla un intento más, su usuario será bloqueado";
                     }
                 }
             } else {
-                mensaje = "Usuario o contraseña incorrectos."; //El usuario no existe.
+                mensaje = "//El usuario no existe."; //El usuario no existe.
             }
         }
         model.addAttribute("mensaje", mensaje);
