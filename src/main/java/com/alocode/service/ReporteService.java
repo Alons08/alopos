@@ -24,7 +24,7 @@ public class ReporteService {
     
     public ReporteDiario generarReporteDiario(LocalDateTime fecha) {
         LocalDateTime fin = fecha.plusDays(1);
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
             EstadoPedido.PAGADO,
             fecha,
             fin
@@ -61,7 +61,7 @@ public class ReporteService {
             new java.util.Date(java.sql.Timestamp.valueOf(fin).getTime())
         );
 
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
             EstadoPedido.PAGADO,
             inicio,
             fin
@@ -81,7 +81,7 @@ public class ReporteService {
     }
     
     public ReporteMensual generarReporteMensual(LocalDateTime inicio, LocalDateTime fin) {
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetween(
+    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
             EstadoPedido.PAGADO,
             inicio,
             fin

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
+
     java.util.List<Mesa> findAllByOrderByIdAsc();
     List<Mesa> findByEstado(EstadoMesa estado);
     
@@ -23,4 +24,5 @@ public interface MesaRepository extends JpaRepository<Mesa, Long> {
 
     @Query("SELECT m FROM Mesa m WHERE (:q IS NULL OR CAST(m.numero AS string) LIKE %:q% OR LOWER(m.estado) LIKE LOWER(CONCAT('%', :q, '%')) ) ORDER BY m.numero")
     List<Mesa> buscarPorNumeroOEstado(@Param("q") String q);
+    
 }

@@ -46,6 +46,8 @@ public class CajaController {
             if (usuario == null) {
                 throw new IllegalStateException("No se pudo obtener el usuario autenticado");
             }
+            // Cancelar pedidos pendientes de días anteriores antes de abrir la caja
+            pedidoService.cancelarPedidosPendientesDeDiasAnteriores();
             cajaService.abrirCaja(montoApertura, usuario);
             redirectAttributes.addFlashAttribute("success", "Caja abierta exitosamente");
         } catch (Exception e) {

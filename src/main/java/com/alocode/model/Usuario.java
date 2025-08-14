@@ -39,7 +39,7 @@ public class Usuario {
     @Column(name = "intentos_fallidos")
     private int intentosFallidos = 0;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_ultimo_intento")
     private Date fechaUltimoIntento;
 

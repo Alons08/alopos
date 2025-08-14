@@ -8,12 +8,14 @@ import org.springframework.stereotype.Repository;
 import com.alocode.model.Pedido;
 import com.alocode.model.enums.EstadoPedido;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-    java.util.List<Pedido> findAllByOrderByIdAsc();
+
+    List<Pedido> findAllByOrderByIdAsc();
     
     List<Pedido> findByEstadoIn(List<EstadoPedido> estados);
     
@@ -28,5 +30,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
     List<Pedido> findByCajaIdAndEstado(Long cajaId, EstadoPedido estado);
     
-    List<Pedido> findByEstadoAndFechaPagadoBetween(EstadoPedido estado, java.time.LocalDateTime inicio, java.time.LocalDateTime fin);
+    List<Pedido> findByEstadoAndFechaPagadoBetween(EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
+    List<Pedido> findByEstadoAndFechaPagadoBetweenOrderByIdAsc(EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
+
 }

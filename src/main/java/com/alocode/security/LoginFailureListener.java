@@ -22,29 +22,31 @@ public class LoginFailureListener implements ApplicationListener<AuthenticationF
     public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         String username = (String) event.getAuthentication().getPrincipal();
         usuarioRepository.getUserByUsername(username).ifPresent(usuario -> {
-            Date hoy = resetTime(new Date());
+            Date ahora = new Date();
             Date ultimoIntento = usuario.getFechaUltimoIntento();
-            if (ultimoIntento == null || !hoy.equals(ultimoIntento)) {
+            // Compara solo la fecha (sin hora) para resetear intentos si es un nuevo día
+            boolean esNuevoDia = false;
+            if (ultimoIntento == null) {
+                esNuevoDia = true;
+            } else {
+                Calendar cal1 = Calendar.getInstance();
+                cal1.setTime(ultimoIntento);
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(ahora);
+                esNuevoDia = cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)
+                        || cal1.get(Calendar.DAY_OF_YEAR) != cal2.get(Calendar.DAY_OF_YEAR);
+            }
+            if (esNuevoDia) {
                 usuario.setIntentosFallidos(1);
-                usuario.setFechaUltimoIntento(hoy);
             } else {
                 usuario.setIntentosFallidos(usuario.getIntentosFallidos() + 1);
             }
+            usuario.setFechaUltimoIntento(ahora);
             if (usuario.getIntentosFallidos() >= 4) {
                 usuario.setActivo(false);
             }
             usuarioRepository.save(usuario);
         });
-    }
-
-    private Date resetTime(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
     }
     
 }
