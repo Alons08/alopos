@@ -61,11 +61,11 @@ public class WebSecurityConfig {
                         //rutas públicas
                         .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
 
-                        //rutas de la secretaria
-                        .requestMatchers("/pedidos/**", "/reportes/diario").hasAnyAuthority("SECRETARIA")
+                        //rutas de la secretaria y administrador en común
+                        .requestMatchers("/pedidos/**", "/reportes/diario").hasAnyAuthority("SECRETARIA", "ADMIN")
 
                         //rutas del administrador
-                        .requestMatchers("/caja/**", "/productos/**", "/mesas/**", "/pedidos/**", "/reportes/**").hasAuthority("ADMIN")
+                        .requestMatchers("/caja/**", "/productos/**", "/mesas/**", "/reportes/**").hasAuthority("ADMIN")
                         .requestMatchers("/admin/usuarios/**").hasAuthority("ADMIN")
 
                         //todas las demás rutas requieren autenticación
