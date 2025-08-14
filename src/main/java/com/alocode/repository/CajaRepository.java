@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface CajaRepository extends JpaRepository<Caja, Long> {
+    
     Optional<Caja> findByFechaAndEstado(Date fecha, EstadoCaja estado);
     
     @Query("SELECT c FROM Caja c WHERE c.fecha = :fecha ORDER BY c.id DESC")
@@ -21,5 +22,6 @@ public interface CajaRepository extends JpaRepository<Caja, Long> {
     
     @Query("SELECT c FROM Caja c WHERE c.estado = 'ABIERTA' AND c.fecha = CURRENT_DATE")
     Optional<Caja> findCajaAbiertaHoy();
+
     List<Caja> findByFechaBetween(Date inicio, Date fin);
 }

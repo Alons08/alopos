@@ -21,22 +21,21 @@ import java.time.ZoneId;
 public class ReporteService {
     private final PedidoRepository pedidoRepository;
     private final CajaRepository cajaRepository;
-    
+
     public ReporteDiario generarReporteDiario(LocalDateTime fecha) {
         LocalDateTime fin = fecha.plusDays(1);
-    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
-            EstadoPedido.PAGADO,
-            fecha,
-            fin
-        );
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
+                EstadoPedido.PAGADO,
+                fecha,
+                fin);
 
         double totalVentas = pedidos.stream()
-            .mapToDouble(p -> p.getTotal() - p.getRecargo())
-            .sum();
+                .mapToDouble(p -> p.getTotal() - p.getRecargo())
+                .sum();
 
         double totalRecargos = pedidos.stream()
-            .mapToDouble(Pedido::getRecargo)
-            .sum();
+                .mapToDouble(Pedido::getRecargo)
+                .sum();
 
         double totalNeto = totalVentas + totalRecargos;
 
@@ -44,52 +43,47 @@ public class ReporteService {
         Optional<Caja> caja = cajaRepository.findByFecha(java.sql.Timestamp.valueOf(fecha)).stream().findFirst();
 
         return new ReporteDiario(
-            java.sql.Timestamp.valueOf(fecha),
-            caja.map(Caja::getMontoApertura).orElse(0.0),
-            caja.map(Caja::getMontoCierre).orElse(0.0),
-            totalVentas,
-            totalRecargos,
-            totalNeto,
-            pedidos
-        );
+                java.sql.Timestamp.valueOf(fecha),
+                caja.map(Caja::getMontoApertura).orElse(0.0),
+                caja.map(Caja::getMontoCierre).orElse(0.0),
+                totalVentas,
+                totalRecargos,
+                totalNeto,
+                pedidos);
     }
-    
+
     public ReporteSemanal generarReporteSemanal(LocalDateTime inicio, LocalDateTime fin) {
         // Convertir LocalDateTime a java.util.Date para el repositorio
         List<Caja> cajas = cajaRepository.findByFechaBetween(
-            new java.util.Date(java.sql.Timestamp.valueOf(inicio).getTime()),
-            new java.util.Date(java.sql.Timestamp.valueOf(fin).getTime())
-        );
+                new java.util.Date(java.sql.Timestamp.valueOf(inicio).getTime()),
+                new java.util.Date(java.sql.Timestamp.valueOf(fin).getTime()));
 
-    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
-            EstadoPedido.PAGADO,
-            inicio,
-            fin
-        );
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
+                EstadoPedido.PAGADO,
+                inicio,
+                fin);
 
         double totalSemanal = pedidos.stream()
-            .mapToDouble(Pedido::getTotal)
-            .sum();
+                .mapToDouble(Pedido::getTotal)
+                .sum();
 
         return new ReporteSemanal(
-            java.sql.Timestamp.valueOf(inicio),
-            java.sql.Timestamp.valueOf(fin),
-            totalSemanal,
-            cajas,
-            pedidos
-        );
+                java.sql.Timestamp.valueOf(inicio),
+                java.sql.Timestamp.valueOf(fin),
+                totalSemanal,
+                cajas,
+                pedidos);
     }
-    
+
     public ReporteMensual generarReporteMensual(LocalDateTime inicio, LocalDateTime fin) {
-    List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
-            EstadoPedido.PAGADO,
-            inicio,
-            fin
-        );
+        List<Pedido> pedidos = pedidoRepository.findByEstadoAndFechaPagadoBetweenOrderByIdAsc(
+                EstadoPedido.PAGADO,
+                inicio,
+                fin);
 
         double totalMensual = pedidos.stream()
-            .mapToDouble(Pedido::getTotal)
-            .sum();
+                .mapToDouble(Pedido::getTotal)
+                .sum();
 
         // Agrupar pedidos solo por los días del mes, sin extender semanas fuera del mes
         List<ReporteService.SemanaResumen> semanas = new java.util.ArrayList<>();
@@ -97,40 +91,42 @@ public class ReporteService {
         while (semanaInicio.isBefore(fin)) {
             final LocalDateTime semanaInicioFinal = semanaInicio;
             LocalDateTime semanaFin = semanaInicio.plusDays(6);
-            if (semanaFin.isAfter(fin)) semanaFin = fin;
+            if (semanaFin.isAfter(fin))
+                semanaFin = fin;
             final LocalDateTime semanaFinFinal = semanaFin;
             // Filtrar pedidos de la semana SOLO dentro del mes
             List<Pedido> pedidosSemana = pedidos.stream()
-                .filter(p -> {
-                    Date fechaPedidoDate = p.getFechaPagado();
-                    if (fechaPedidoDate == null) return false;
-                    LocalDateTime fechaPedido = fechaPedidoDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    return (fechaPedido.isEqual(semanaInicioFinal) || fechaPedido.isAfter(semanaInicioFinal)) && fechaPedido.isBefore(semanaFinFinal.plusDays(1));
-                })
-                .collect(java.util.stream.Collectors.toList());
+                    .filter(p -> {
+                        Date fechaPedidoDate = p.getFechaPagado();
+                        if (fechaPedidoDate == null)
+                            return false;
+                        LocalDateTime fechaPedido = fechaPedidoDate.toInstant().atZone(ZoneId.systemDefault())
+                                .toLocalDateTime();
+                        return (fechaPedido.isEqual(semanaInicioFinal) || fechaPedido.isAfter(semanaInicioFinal))
+                                && fechaPedido.isBefore(semanaFinFinal.plusDays(1));
+                    })
+                    .collect(java.util.stream.Collectors.toList());
             double totalSemana = pedidosSemana.stream().mapToDouble(Pedido::getTotal).sum();
             int cantidadPedidos = pedidosSemana.size();
             if (totalSemana > 0 || cantidadPedidos > 0) {
                 semanas.add(new ReporteService.SemanaResumen(
-                    java.sql.Timestamp.valueOf(semanaInicioFinal),
-                    java.sql.Timestamp.valueOf(semanaFinFinal),
-                    totalSemana,
-                    cantidadPedidos,
-                    pedidosSemana
-                ));
+                        java.sql.Timestamp.valueOf(semanaInicioFinal),
+                        java.sql.Timestamp.valueOf(semanaFinFinal),
+                        totalSemana,
+                        cantidadPedidos,
+                        pedidosSemana));
             }
             semanaInicio = semanaFinFinal.plusDays(1);
         }
 
         return new ReporteMensual(
-            java.sql.Timestamp.valueOf(inicio),
-            java.sql.Timestamp.valueOf(fin),
-            totalMensual,
-            pedidos,
-            semanas
-        );
+                java.sql.Timestamp.valueOf(inicio),
+                java.sql.Timestamp.valueOf(fin),
+                totalMensual,
+                pedidos,
+                semanas);
     }
-    
+
     // Clases internas para los reportes
 
     // Clase para resumen semanal dentro del reporte mensual
@@ -141,7 +137,8 @@ public class ReporteService {
         private int cantidadPedidos;
         private List<Pedido> pedidos;
 
-        public SemanaResumen(java.util.Date inicio, java.util.Date fin, double totalSemana, int cantidadPedidos, List<Pedido> pedidos) {
+        public SemanaResumen(java.util.Date inicio, java.util.Date fin, double totalSemana, int cantidadPedidos,
+                List<Pedido> pedidos) {
             this.inicio = inicio;
             this.fin = fin;
             this.totalSemana = totalSemana;
@@ -149,12 +146,27 @@ public class ReporteService {
             this.pedidos = pedidos;
         }
 
-        public java.util.Date getInicio() { return inicio; }
-        public java.util.Date getFin() { return fin; }
-        public double getTotalSemana() { return totalSemana; }
-        public int getCantidadPedidos() { return cantidadPedidos; }
-        public List<Pedido> getPedidos() { return pedidos; }
+        public java.util.Date getInicio() {
+            return inicio;
+        }
+
+        public java.util.Date getFin() {
+            return fin;
+        }
+
+        public double getTotalSemana() {
+            return totalSemana;
+        }
+
+        public int getCantidadPedidos() {
+            return cantidadPedidos;
+        }
+
+        public List<Pedido> getPedidos() {
+            return pedidos;
+        }
     }
+
     public static class ReporteDiario {
         private java.util.Date fecha;
         private double montoApertura;
@@ -164,7 +176,8 @@ public class ReporteService {
         private double totalNeto;
         private List<Pedido> pedidos;
 
-        public ReporteDiario(java.util.Date fecha, double montoApertura, double montoCierre, double totalVentas, double totalRecargos, double totalNeto, List<Pedido> pedidos) {
+        public ReporteDiario(java.util.Date fecha, double montoApertura, double montoCierre, double totalVentas,
+                double totalRecargos, double totalNeto, List<Pedido> pedidos) {
             this.fecha = fecha;
             this.montoApertura = montoApertura;
             this.montoCierre = montoCierre;
@@ -174,20 +187,61 @@ public class ReporteService {
             this.pedidos = pedidos;
         }
 
-        public java.util.Date getFecha() { return fecha; }
-        public void setFecha(java.util.Date fecha) { this.fecha = fecha; }
-        public double getMontoApertura() { return montoApertura; }
-        public void setMontoApertura(double montoApertura) { this.montoApertura = montoApertura; }
-        public double getMontoCierre() { return montoCierre; }
-        public void setMontoCierre(double montoCierre) { this.montoCierre = montoCierre; }
-        public double getTotalVentas() { return totalVentas; }
-        public void setTotalVentas(double totalVentas) { this.totalVentas = totalVentas; }
-        public double getTotalRecargos() { return totalRecargos; }
-        public void setTotalRecargos(double totalRecargos) { this.totalRecargos = totalRecargos; }
-        public double getTotalNeto() { return totalNeto; }
-        public void setTotalNeto(double totalNeto) { this.totalNeto = totalNeto; }
-        public List<Pedido> getPedidos() { return pedidos; }
-        public void setPedidos(List<Pedido> pedidos) { this.pedidos = pedidos; }
+        public java.util.Date getFecha() {
+            return fecha;
+        }
+
+        public void setFecha(java.util.Date fecha) {
+            this.fecha = fecha;
+        }
+
+        public double getMontoApertura() {
+            return montoApertura;
+        }
+
+        public void setMontoApertura(double montoApertura) {
+            this.montoApertura = montoApertura;
+        }
+
+        public double getMontoCierre() {
+            return montoCierre;
+        }
+
+        public void setMontoCierre(double montoCierre) {
+            this.montoCierre = montoCierre;
+        }
+
+        public double getTotalVentas() {
+            return totalVentas;
+        }
+
+        public void setTotalVentas(double totalVentas) {
+            this.totalVentas = totalVentas;
+        }
+
+        public double getTotalRecargos() {
+            return totalRecargos;
+        }
+
+        public void setTotalRecargos(double totalRecargos) {
+            this.totalRecargos = totalRecargos;
+        }
+
+        public double getTotalNeto() {
+            return totalNeto;
+        }
+
+        public void setTotalNeto(double totalNeto) {
+            this.totalNeto = totalNeto;
+        }
+
+        public List<Pedido> getPedidos() {
+            return pedidos;
+        }
+
+        public void setPedidos(List<Pedido> pedidos) {
+            this.pedidos = pedidos;
+        }
     }
 
     public static class ReporteSemanal {
@@ -197,7 +251,8 @@ public class ReporteService {
         private List<Caja> cajas;
         private List<Pedido> pedidos;
 
-        public ReporteSemanal(java.util.Date inicio, java.util.Date fin, double totalSemanal, List<Caja> cajas, List<Pedido> pedidos) {
+        public ReporteSemanal(java.util.Date inicio, java.util.Date fin, double totalSemanal, List<Caja> cajas,
+                List<Pedido> pedidos) {
             this.inicio = inicio;
             this.fin = fin;
             this.totalSemanal = totalSemanal;
@@ -205,16 +260,45 @@ public class ReporteService {
             this.pedidos = pedidos;
         }
 
-        public java.util.Date getInicio() { return inicio; }
-        public void setInicio(java.util.Date inicio) { this.inicio = inicio; }
-        public java.util.Date getFin() { return fin; }
-        public void setFin(java.util.Date fin) { this.fin = fin; }
-        public double getTotalSemanal() { return totalSemanal; }
-        public void setTotalSemanal(double totalSemanal) { this.totalSemanal = totalSemanal; }
-        public List<Caja> getCajas() { return cajas; }
-        public void setCajas(List<Caja> cajas) { this.cajas = cajas; }
-        public List<Pedido> getPedidos() { return pedidos; }
-        public void setPedidos(List<Pedido> pedidos) { this.pedidos = pedidos; }
+        public java.util.Date getInicio() {
+            return inicio;
+        }
+
+        public void setInicio(java.util.Date inicio) {
+            this.inicio = inicio;
+        }
+
+        public java.util.Date getFin() {
+            return fin;
+        }
+
+        public void setFin(java.util.Date fin) {
+            this.fin = fin;
+        }
+
+        public double getTotalSemanal() {
+            return totalSemanal;
+        }
+
+        public void setTotalSemanal(double totalSemanal) {
+            this.totalSemanal = totalSemanal;
+        }
+
+        public List<Caja> getCajas() {
+            return cajas;
+        }
+
+        public void setCajas(List<Caja> cajas) {
+            this.cajas = cajas;
+        }
+
+        public List<Pedido> getPedidos() {
+            return pedidos;
+        }
+
+        public void setPedidos(List<Pedido> pedidos) {
+            this.pedidos = pedidos;
+        }
     }
 
     public static class ReporteMensual {
@@ -224,7 +308,8 @@ public class ReporteService {
         private List<Pedido> pedidos;
         private List<SemanaResumen> semanas;
 
-        public ReporteMensual(java.util.Date inicio, java.util.Date fin, double totalMensual, List<Pedido> pedidos, List<SemanaResumen> semanas) {
+        public ReporteMensual(java.util.Date inicio, java.util.Date fin, double totalMensual, List<Pedido> pedidos,
+                List<SemanaResumen> semanas) {
             this.inicio = inicio;
             this.fin = fin;
             this.totalMensual = totalMensual;
@@ -232,15 +317,44 @@ public class ReporteService {
             this.semanas = semanas;
         }
 
-        public java.util.Date getInicio() { return inicio; }
-        public void setInicio(java.util.Date inicio) { this.inicio = inicio; }
-        public java.util.Date getFin() { return fin; }
-        public void setFin(java.util.Date fin) { this.fin = fin; }
-        public double getTotalMensual() { return totalMensual; }
-        public void setTotalMensual(double totalMensual) { this.totalMensual = totalMensual; }
-        public List<Pedido> getPedidos() { return pedidos; }
-        public void setPedidos(List<Pedido> pedidos) { this.pedidos = pedidos; }
-        public List<SemanaResumen> getSemanas() { return semanas; }
-        public void setSemanas(List<SemanaResumen> semanas) { this.semanas = semanas; }
+        public java.util.Date getInicio() {
+            return inicio;
+        }
+
+        public void setInicio(java.util.Date inicio) {
+            this.inicio = inicio;
+        }
+
+        public java.util.Date getFin() {
+            return fin;
+        }
+
+        public void setFin(java.util.Date fin) {
+            this.fin = fin;
+        }
+
+        public double getTotalMensual() {
+            return totalMensual;
+        }
+
+        public void setTotalMensual(double totalMensual) {
+            this.totalMensual = totalMensual;
+        }
+
+        public List<Pedido> getPedidos() {
+            return pedidos;
+        }
+
+        public void setPedidos(List<Pedido> pedidos) {
+            this.pedidos = pedidos;
+        }
+
+        public List<SemanaResumen> getSemanas() {
+            return semanas;
+        }
+
+        public void setSemanas(List<SemanaResumen> semanas) {
+            this.semanas = semanas;
+        }
     }
 }
