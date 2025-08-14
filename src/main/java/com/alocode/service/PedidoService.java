@@ -25,9 +25,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PedidoService {
-    public List<Pedido> obtenerTodosLosPedidos() {
-        return pedidoRepository.findAllByOrderByIdAsc();
-    }
 
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
@@ -155,9 +152,6 @@ public class PedidoService {
         return pedidos;
     }
 
-    public List<Pedido> obtenerPedidosPagados() {
-        return pedidoRepository.findByEstadoIn(List.of(EstadoPedido.PAGADO));
-    }
 
     public Optional<Pedido> obtenerPedidoPorId(Long id) {
         return pedidoRepository.findById(id);

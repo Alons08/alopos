@@ -115,7 +115,4 @@ public class CajaService {
         return cajaRepository.findCajaAbiertaHoy();
     }
 
-    public List<Caja> obtenerCajasPorFecha(Date fecha) {
-        return cajaRepository.findByFecha(fecha);
-    }
 }

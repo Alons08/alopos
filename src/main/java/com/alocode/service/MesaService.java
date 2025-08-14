@@ -43,9 +43,6 @@ public class MesaService {
         mesaRepository.deleteById(id);
     }
     
-    public Optional<Mesa> obtenerMesaPorNumero(Integer numero) {
-        return mesaRepository.findByNumero(numero);
-    }
 
     public Optional<Mesa> obtenerMesaPorId(Long id) {
         return mesaRepository.findById(id);

@@ -30,7 +30,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
     List<Pedido> findByCajaIdAndEstado(Long cajaId, EstadoPedido estado);
     
-    List<Pedido> findByEstadoAndFechaPagadoBetween(EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
     List<Pedido> findByEstadoAndFechaPagadoBetweenOrderByIdAsc(EstadoPedido estado, LocalDateTime inicio, LocalDateTime fin);
 
 }
