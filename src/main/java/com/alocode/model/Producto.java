@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "productos", indexes = {
+    @Index(name = "idx_producto_nombre", columnList = "nombre"),
+    @Index(name = "idx_producto_activo", columnList = "activo")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

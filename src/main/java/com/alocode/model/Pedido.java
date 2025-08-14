@@ -9,7 +9,12 @@ import com.alocode.model.enums.EstadoPedido;
 import com.alocode.model.enums.TipoPedido;
 
 @Entity
-@Table(name = "pedidos")
+@Table(name = "pedidos", indexes = {
+    @Index(name = "idx_pedido_fecha", columnList = "fecha"),
+    @Index(name = "idx_pedido_estado", columnList = "estado"),
+    @Index(name = "idx_pedido_usuario", columnList = "usuario_id"),
+    @Index(name = "idx_pedido_caja", columnList = "caja_id")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

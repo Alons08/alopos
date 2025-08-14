@@ -12,7 +12,9 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", indexes = {
+    @Index(name = "idx_usuario_activo", columnList = "activo")
+})
 @Data
 public class Usuario {
 

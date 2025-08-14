@@ -8,7 +8,11 @@ import java.util.Date;
 import com.alocode.model.enums.EstadoCaja;
 
 @Entity
-@Table(name = "caja")
+@Table(name = "caja", indexes = {
+    @Index(name = "idx_caja_fecha", columnList = "fecha"),
+    @Index(name = "idx_caja_estado", columnList = "estado"),
+    @Index(name = "idx_caja_usuario", columnList = "usuario_id")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
