@@ -50,7 +50,7 @@ public class CajaService {
             pedidosPendientes.forEach(p -> {
                 p.setEstado(EstadoPedido.CANCELADO);
                 if (p.getTipo() != null && p.getTipo().name().equals("MESA") && p.getMesa() != null) {
-                    p.getMesa().setEstado(com.alocode.model.enums.EstadoMesa.DISPONIBLE);
+                    p.getMesa().setEstado(EstadoMesa.DISPONIBLE);
                     mesaRepository.save(p.getMesa());
                 }
             });
