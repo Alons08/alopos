@@ -8,6 +8,7 @@ import com.alocode.model.Caja;
 import com.alocode.model.Pedido;
 import com.alocode.model.Usuario;
 import com.alocode.model.enums.EstadoCaja;
+import com.alocode.model.enums.EstadoMesa;
 import com.alocode.model.enums.EstadoPedido;
 import com.alocode.repository.CajaRepository;
 import com.alocode.repository.PedidoRepository;
