@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 
 import com.alocode.service.impl.UserDetailsServiceImpl;
 
@@ -52,6 +54,11 @@ public class WebSecurityConfig {
         return authMB.build();
     }
 
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
     //CREAMOS un FILTRO (define las reglas de autorizacion para las solicitudes HTTP)
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -82,6 +89,7 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session
                     .maximumSessions(1)
                     .maxSessionsPreventsLogin(false) // Si es true, bloquea el nuevo login; si es false, cierra la sesión anterior
+                    .sessionRegistry(sessionRegistry()) // <--- Asegura control de sesiones concurrentes
                 )
                 // Configura el manejo del cierre de sesión en la aplicación.
                 .logout(logout -> logout
