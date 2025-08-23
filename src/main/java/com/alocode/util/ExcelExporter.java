@@ -36,7 +36,7 @@ public class ExcelExporter {
                     fechaReporte = new SimpleDateFormat("dd-MM-yyyy").format(diario.getFecha());
                 }
                 // Configurar anchos de columnas (en unidades de 1/256 de ancho de carácter)
-                sheet.setColumnWidth(0, 12*256);  // Columna A
+                sheet.setColumnWidth(0, 16*256);  // Columna A
                 sheet.setColumnWidth(1, 20*256);  // Columna B
                 sheet.setColumnWidth(2, 20*256);  // Columna C
                 sheet.setColumnWidth(3, 15*256);  // Columna D
@@ -68,40 +68,29 @@ public class ExcelExporter {
                     headerStyle, centeredStyle, centeredCurrencyStyle, dateStyle);
                 
                 // Espacio antes de la tabla de pedidos
-                rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
+                rowIdx = addSeparatorRow(sheet, rowIdx, 6, separatorStyle);
                 
                 // Cabecera de pedidos
                 String[] pedidosHeaders = {
-                    "ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Observaciones", "Fecha Pagado"
+                    "ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Fecha Pagado"
                 };
                 rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
                 
                 // Datos de pedidos
-                boolean firstPedido = true;
+                // boolean firstPedido = true;
                 for (Pedido p : diario.getPedidos()) {
-                    if (!firstPedido) {
-                        // Agregar separador entre pedidos
-                        rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
-                    }
-                    firstPedido = false;
-                    
                     Row row = sheet.createRow(rowIdx++);
                     row.setHeightInPoints(20);
-                    
                     int colIdx = 0;
-                    
                     addCell(row, colIdx++, p.getId(), centeredStyle);
                     addCell(row, colIdx++, p.getMesa() != null ? String.valueOf(p.getMesa().getNumero()) : "", centeredStyle);
                     addCell(row, colIdx++, p.getUsuario() != null ? p.getUsuario().getNombre() : "", centeredStyle);
                     addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
-                    addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
                     addCell(row, colIdx++, p.getFechaPagado() != null ? p.getFechaPagado() : null, dateStyle);
-                    
+
                     // Detalles del pedido
                     if (p.getDetalles() != null && !p.getDetalles().isEmpty()) {
-                        rowIdx++;  // Espacio antes de los detalles
-                        
                         // Título de detalles
                         Row detTitleRow = sheet.createRow(rowIdx++);
                         detTitleRow.setHeightInPoints(20);
@@ -109,23 +98,25 @@ public class ExcelExporter {
                         detTitleCell.setCellValue("DETALLES DEL PEDIDO");
                         detTitleCell.setCellStyle(headerStyle);
                         sheet.addMergedRegion(new CellRangeAddress(detTitleRow.getRowNum(), detTitleRow.getRowNum(), 1, 4));
-                        
+
                         // Cabecera de detalles
                         String[] detallesHeaders = {"Producto", "Cantidad", "Precio Unitario", "Subtotal"};
                         rowIdx = createTableHeader(sheet, rowIdx, detallesHeaders, headerStyle, 1);
-                        
+
                         // Datos de detalles
                         for (DetallePedido d : p.getDetalles()) {
                             Row detRow = sheet.createRow(rowIdx++);
                             detRow.setHeightInPoints(18);
                             colIdx = 1;
-                            
                             addCell(detRow, colIdx++, d.getProducto() != null ? d.getProducto().getNombre() : "", centeredStyle);
                             addCell(detRow, colIdx++, d.getCantidad(), centeredStyle);
                             addCell(detRow, colIdx++, d.getPrecioUnitario(), centeredCurrencyStyle);
                             addCell(detRow, colIdx++, d.getSubtotal(), centeredCurrencyStyle);
                         }
                     }
+
+                    // Espacio en blanco después de los detalles del pedido (o después del pedido si no hay detalles)
+                    rowIdx = addSeparatorRow(sheet, rowIdx, 6, separatorStyle);
                 }
                 
             } else if (reporte instanceof ReporteService.ReporteSemanal semanal) {
@@ -188,14 +179,11 @@ public class ExcelExporter {
                 rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
 
                 // Cabecera de pedidos
-                String[] pedidosHeaders = {"ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Observaciones", "Fecha Pagado"};
+                String[] pedidosHeaders = {"ID Pedido", "Mesa", "Usuario", "Total", "Recargo", "Fecha Pagado"};
                 rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
                 boolean firstPedido = true;
                 for (Pedido p : semanal.getPedidos()) {
-                    if (!firstPedido) {
-                        rowIdx = addSeparatorRow(sheet, rowIdx, 7, separatorStyle);
-                    }
-                    firstPedido = false;
+                    // No agregar separador entre pedidos en el reporte semanal
                     Row row = sheet.createRow(rowIdx++);
                     row.setHeightInPoints(20);
                     int colIdx = 0;
@@ -204,7 +192,6 @@ public class ExcelExporter {
                     addCell(row, colIdx++, p.getUsuario() != null ? p.getUsuario().getNombre() : "", centeredStyle);
                     addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
-                    addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
                     addCell(row, colIdx++, p.getFechaPagado() != null ? p.getFechaPagado() : null, dateStyle);
                 }
 
@@ -265,7 +252,7 @@ public class ExcelExporter {
                 rowIdx = addSeparatorRow(sheet, rowIdx, 5, separatorStyle);
 
                 // Cabecera de pedidos
-                String[] pedidosHeaders = {"ID Pedido", "Fecha Pagado", "Total", "Recargo", "Usuario", "Observaciones"};
+                String[] pedidosHeaders = {"ID Pedido", "Fecha Pagado", "Total", "Recargo", "Usuario"};
                 rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
                 for (Pedido p : mensual.getPedidos()) {
                     Row row = sheet.createRow(rowIdx++);
@@ -275,7 +262,6 @@ public class ExcelExporter {
                     addCell(row, colIdx++, p.getTotal(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getRecargo(), centeredCurrencyStyle);
                     addCell(row, colIdx++, p.getUsuario() != null ? p.getUsuario().getNombre() : "", centeredStyle);
-                    addCell(row, colIdx++, p.getObservaciones() != null ? p.getObservaciones() : "", centeredStyle);
                 }
 
                 // Nombre de archivo con rango de fechas
@@ -362,10 +348,10 @@ public class ExcelExporter {
     }
     
     private static CellStyle createCurrencyStyle(Workbook workbook) {
-        CellStyle style = createDataStyle(workbook);
-        style.setDataFormat(workbook.createDataFormat().getFormat("$#,##0.00"));
-        style.setAlignment(HorizontalAlignment.RIGHT);
-        return style;
+    CellStyle style = createDataStyle(workbook);
+    style.setDataFormat(workbook.createDataFormat().getFormat("\"S/\"#,##0.00"));
+    style.setAlignment(HorizontalAlignment.RIGHT);
+    return style;
     }
     
     private static CellStyle createCenteredCurrencyStyle(Workbook workbook) {
