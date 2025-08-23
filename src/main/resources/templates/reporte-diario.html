@@ -180,7 +180,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="card-title">VENTAS TOTALES</h6>
+                                        <h6 class="card-title">TOTAL VENTAS</h6>
                                         <p class="card-text">S/ <span th:text="${#numbers.formatDecimal(reporte.totalVentas, 1, 2)}"></span></p>
                                     </div>
                                     <i class="bi bi-wallet2 fs-4"></i>
@@ -195,7 +195,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="card-title">RECARGOS TOTALES</h6>
+                                        <h6 class="card-title">TOTAL RECARGOS</h6>
                                         <p class="card-text">S/ <span th:text="${#numbers.formatDecimal(reporte.totalRecargos, 1, 2)}"></span></p>
                                     </div>
                                     <i class="bi bi-plus-circle fs-4"></i>
@@ -210,7 +210,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="card-title">GANANCIA TOTAL NETA</h6>
+                                        <h6 class="card-title">TOTAL GENERAL</h6>
                                         <p class="card-text">S/ <span th:text="${#numbers.formatDecimal(reporte.totalNeto, 1, 2)}"></span></p>
                                     </div>
                                     <i class="bi bi-cash-stack fs-4"></i>
@@ -248,7 +248,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Total Pedidos:</span>
+                                    <span class="text-muted">Cantidad de Pedidos:</span>
                                     <strong th:text="${reporte.pedidos.size()}"></strong>
                                 </div>
                                 <div class="d-flex justify-content-between">

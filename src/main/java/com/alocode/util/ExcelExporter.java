@@ -56,7 +56,7 @@ public class ExcelExporter {
                 
                 // Información general
                 rowIdx = addGeneralInfo(sheet, rowIdx, 
-                    new String[] {"Fecha", "Monto Apertura", "Monto Cierre", "Total Ventas", "Total Recargos", "Total Neto"},
+                    new String[] {"Fecha", "Monto Apertura", "Monto Cierre", "Total Ventas", "Total Recargos", "Total General"},
                     new Object[] {
                         diario.getFecha(),
                         diario.getMontoApertura(),
@@ -149,7 +149,7 @@ public class ExcelExporter {
                 rowIdx = addSeparatorRow(sheet, rowIdx, 6, separatorStyle);
 
                 // Cabecera resumen por día
-                String[] headers = {"Fecha", "Monto Apertura", "Monto Cierre", "Total Ventas", "Total Pedidos", "Estado Caja"};
+                String[] headers = {"Fecha", "Monto Apertura", "Monto Cierre", "Total General", "Total Pedidos", "Estado Caja"};
                 rowIdx = createTableHeader(sheet, rowIdx, headers, headerStyle);
 
                 // Filas por cada caja (día)
@@ -159,10 +159,10 @@ public class ExcelExporter {
                     addCell(row, colIdx++, caja.getFecha(), dateStyle);
                     addCell(row, colIdx++, caja.getMontoApertura(), centeredCurrencyStyle);
                     addCell(row, colIdx++, caja.getMontoCierre(), centeredCurrencyStyle);
-                    // Calcular total ventas del día
+                    // Calcular total ventas del día (ventas + recargos)
                     double totalVentasDia = semanal.getPedidos().stream()
                         .filter(p -> p.getCaja() != null && p.getCaja().getId().equals(caja.getId()))
-                        .mapToDouble(com.alocode.model.Pedido::getTotal)
+                        .mapToDouble(p -> p.getTotal() + p.getRecargo())
                         .sum();
                     addCell(row, colIdx++, totalVentasDia, centeredCurrencyStyle);
                     // Total pedidos del día
@@ -232,7 +232,7 @@ public class ExcelExporter {
                 rowIdx = addSeparatorRow(sheet, rowIdx, 5, separatorStyle);
 
                 // Cabecera resumen semanal
-                String[] headers = {"Semana", "Periodo", "Total Ventas", "N° Pedidos"};
+                String[] headers = {"Semana", "Periodo", "Total General", "N° Pedidos"};
                 rowIdx = createTableHeader(sheet, rowIdx, headers, headerStyle);
 
                 // Filas por cada semana
@@ -252,7 +252,7 @@ public class ExcelExporter {
                 rowIdx = addSeparatorRow(sheet, rowIdx, 5, separatorStyle);
 
                 // Cabecera de pedidos
-                String[] pedidosHeaders = {"ID Pedido", "Fecha Pagado", "Total", "Recargo", "Usuario"};
+                String[] pedidosHeaders = {"ID Pedido", "Fecha Pagado", "Total ventas", "Total recargos", "Usuario"};
                 rowIdx = createTableHeader(sheet, rowIdx, pedidosHeaders, headerStyle);
                 for (Pedido p : mensual.getPedidos()) {
                     Row row = sheet.createRow(rowIdx++);

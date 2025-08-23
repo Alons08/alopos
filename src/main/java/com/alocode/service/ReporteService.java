@@ -63,9 +63,9 @@ public class ReporteService {
                 inicio,
                 fin);
 
-        double totalSemanal = pedidos.stream()
-                .mapToDouble(Pedido::getTotal)
-                .sum();
+    double totalSemanal = pedidos.stream()
+    .mapToDouble(Pedido::getTotal)
+    .sum();
 
         return new ReporteSemanal(
                 java.sql.Timestamp.valueOf(inicio),
@@ -81,9 +81,9 @@ public class ReporteService {
                 inicio,
                 fin);
 
-        double totalMensual = pedidos.stream()
-                .mapToDouble(Pedido::getTotal)
-                .sum();
+    double totalMensual = pedidos.stream()
+    .mapToDouble(Pedido::getTotal)
+    .sum();
 
         // Agrupar pedidos solo por los días del mes, sin extender semanas fuera del mes
         List<ReporteService.SemanaResumen> semanas = new java.util.ArrayList<>();
