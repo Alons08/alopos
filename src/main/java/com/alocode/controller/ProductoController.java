@@ -1,4 +1,3 @@
-
 package com.alocode.controller;
 
 import org.springframework.stereotype.Controller;
@@ -11,7 +10,6 @@ import com.alocode.service.ProductoService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Controller
 @RequestMapping("/productos")
 @RequiredArgsConstructor
@@ -20,11 +18,14 @@ public class ProductoController {
 
     @GetMapping
     public String listarProductos(@RequestParam(value = "q", required = false) String q, Model model) {
+        // Siempre mostrar todos los productos (base, derivados e independientes) en la tabla
         if (q != null && !q.trim().isEmpty()) {
             model.addAttribute("productos", productoService.buscarProductosPorNombre(q));
         } else {
             model.addAttribute("productos", productoService.obtenerTodosLosProductos());
         }
+        // Mantener la alerta informativa de productos base
+        model.addAttribute("productosBase", productoService.obtenerProductosBase());
         return "productos";
     }
     
@@ -35,6 +36,10 @@ public class ProductoController {
         } else {
             model.addAttribute("producto", new Producto());
         }
+        
+        // Agregar lista de productos base para el formulario
+        model.addAttribute("productosBase", productoService.obtenerProductosBase());
+        
         return "nuevo-producto";
     }
     
@@ -66,6 +71,10 @@ public class ProductoController {
     public String mostrarFormularioEditarProducto(@PathVariable Long id, Model model) {
         model.addAttribute("producto", productoService.obtenerProductoPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado")));
+        
+        // Agregar lista de productos base para el formulario
+        model.addAttribute("productosBase", productoService.obtenerProductosBase());
+        
         return "nuevo-producto";
     }
 

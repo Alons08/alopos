@@ -26,12 +26,24 @@ public class Producto {
     private Double precio;
     
     @NotNull(message = "El stock es requerido")
-    @Min(value = 0, message = "El stock no puede ser negativo")
-    private Integer stock;
+    @DecimalMin(value = "0.0", message = "El stock no puede ser negativo")
+    private Double stock;
     
     @Column(name = "stock_ocupado")
-    private Integer stockOcupado = 0;
+    private Double stockOcupado = 0.0;
     
     @NotNull(message = "El estado activo es requerido")
     private Boolean activo = true;
+    
+    @Column(name = "es_producto_base")
+    private Boolean esProductoBase = false;
+    
+    // Relación con producto base (para productos derivados)
+    @ManyToOne
+    @JoinColumn(name = "producto_base_id")
+    private Producto productoBase;
+    
+    // Factor de conversión (ej: 0.25 para cuarto de pollo)
+    @Column(name = "factor_conversion")
+    private Double factorConversion = 1.0;
 }

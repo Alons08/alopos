@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "detalle_pedido", indexes = {
     @Index(name = "idx_detalle_pedido_pedido", columnList = "pedido_id"),
-    @Index(name = "idx_detalle_pedido_producto", columnList = "producto_id")
+    @Index(name = "idx_detalle_pedido_producto", columnList = "producto_id"),
+    @Index(name = "idx_detalle_pedido_producto_base", columnList = "producto_base_id")
 })
 @Data
 @NoArgsConstructor
@@ -24,6 +25,11 @@ public class DetallePedido {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
     
+    // Para productos derivados, referencia al producto base consumido
+    @ManyToOne
+    @JoinColumn(name = "producto_base_id")
+    private Producto productoBase;
+    
     @Column(nullable = false)
     private Integer cantidad;
     
@@ -32,4 +38,8 @@ public class DetallePedido {
     
     @Column(nullable = false)
     private Double subtotal;
+    
+    // Cantidad consumida del producto base
+    @Column(name = "cantidad_base_consumida")
+    private Double cantidadBaseConsumida = 0.0;
 }

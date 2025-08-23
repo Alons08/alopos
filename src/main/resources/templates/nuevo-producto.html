@@ -74,6 +74,20 @@
             border-radius: 8px 0 0 8px;
         }
         
+        .producto-base-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .factor-conversion-section {
+            background-color: #e8f4f8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .card {
                 margin: 0 10px;
@@ -110,6 +124,7 @@
                         <div class="card-body p-4">
                             <form th:action="@{/productos/guardar}" th:object="${producto}" method="post" class="needs-validation" novalidate>
                                 <input type="hidden" th:field="*{id}" />
+                                
                                 <!-- Nombre del Producto -->
                                 <div class="mb-4">
                                     <label for="nombre" class="form-label">Nombre del Producto</label>
@@ -146,6 +161,63 @@
                                             <div class="invalid-feedback">
                                                 Ingrese una cantidad válida.
                                             </div>
+                                        </div>
+                                        <script>
+                                            // Deshabilitar el campo de stock si el producto es derivado
+                                            function toggleStockField() {
+                                                var stockInput = document.getElementById('stock');
+                                                var productoBaseSelect = document.getElementById('productoBase');
+                                                var esProductoBaseCheckbox = document.getElementById('esProductoBase');
+                                                if (productoBaseSelect && productoBaseSelect.value) {
+                                                    stockInput.disabled = true;
+                                                    stockInput.value = '';
+                                                } else {
+                                                    stockInput.disabled = false;
+                                                }
+                                            }
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                var productoBaseSelect = document.getElementById('productoBase');
+                                                if (productoBaseSelect) {
+                                                    productoBaseSelect.addEventListener('change', toggleStockField);
+                                                    toggleStockField();
+                                                }
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tipo de Producto -->
+                                <div class="mb-4">
+                                    <label class="form-label">Tipo de Producto</label>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="esProductoBase" th:field="*{esProductoBase}">
+                                        <label class="form-check-label" for="esProductoBase">
+                                            Este producto es base (sirve como stock para otros productos)
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="producto-base-section" id="productoBaseSection" style="display: none;">
+                                        <label for="productoBase" class="form-label">Producto Base</label>
+                                        <select class="form-select" id="productoBase" th:field="*{productoBase}">
+                                            <option value="">Seleccione un producto base...</option>
+                                            <option th:each="productoBase : ${productosBase}" 
+                                                    th:value="${productoBase.id}"
+                                                    th:text="${productoBase.nombre}"></option>
+                                        </select>
+                                        <small class="form-text text-muted">
+                                            Seleccione el producto base del cual este producto deriva su stock.
+                                        </small>
+                                        
+                                        <div class="factor-conversion-section mt-3" id="factorConversionSection" style="display: none;">
+                                            <label for="factorConversion" class="form-label">Factor de Conversión</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-arrow-left-right"></i></span>
+                              <input type="number" id="factorConversion" th:field="*{factorConversion}" 
+                                  class="form-control" step="any" min="0.001" placeholder="Ej: 0.25 para cuarto de pollo" required onfocus="this.value=''" autocomplete="off">
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                Ej: 0.125 para octavo de pollo, 0.25 para cuarto de pollo, 0.5 para medio pollo.
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -210,6 +282,53 @@
         document.getElementById('stock')?.addEventListener('input', function(e) {
             if (this.value && parseInt(this.value) < 0) {
                 this.value = 0;
+            }
+        });
+        
+        // Mostrar/ocultar sección de producto base
+        const esProductoBaseCheckbox = document.getElementById('esProductoBase');
+        const productoBaseSection = document.getElementById('productoBaseSection');
+        const productoBaseSelect = document.getElementById('productoBase');
+        const factorConversionSection = document.getElementById('factorConversionSection');
+        
+        function toggleProductoBaseSection() {
+            if (esProductoBaseCheckbox.checked) {
+                productoBaseSection.style.display = 'none';
+                productoBaseSelect.value = '';
+                factorConversionSection.style.display = 'none';
+            } else {
+                productoBaseSection.style.display = 'block';
+            }
+        }
+        
+        function toggleFactorConversionSection() {
+            if (productoBaseSelect.value) {
+                factorConversionSection.style.display = 'block';
+            } else {
+                factorConversionSection.style.display = 'none';
+            }
+        }
+        
+        // Inicializar estado
+        toggleProductoBaseSection();
+        toggleFactorConversionSection();
+        
+        // Event listeners
+        esProductoBaseCheckbox.addEventListener('change', toggleProductoBaseSection);
+        productoBaseSelect.addEventListener('change', toggleFactorConversionSection);
+        
+        // Si estamos editando, inicializar correctamente
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si ya tiene producto base seleccionado, mostrar las secciones
+            if (productoBaseSelect.value) {
+                esProductoBaseCheckbox.checked = false;
+                toggleProductoBaseSection();
+                toggleFactorConversionSection();
+            }
+            
+            // Si es producto base, ocultar la sección de producto base
+            if (esProductoBaseCheckbox.checked) {
+                toggleProductoBaseSection();
             }
         });
     </script>

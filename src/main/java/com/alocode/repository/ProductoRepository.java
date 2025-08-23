@@ -21,4 +21,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     
     @Query("SELECT p FROM Producto p WHERE p.activo = TRUE AND LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
     List<Producto> buscarPorNombre(@Param("nombre") String nombre);
+    
+    List<Producto> findByEsProductoBaseTrueAndActivoTrue();
+    
+    List<Producto> findByProductoBaseIsNotNullAndActivoTrue();
+    
+    List<Producto> findByProductoBaseId(Long productoBaseId);
 }
