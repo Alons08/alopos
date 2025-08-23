@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.alocode.service.impl.UserDetailsServiceImpl;
 
 @Configuration //esta anotación registra Beans en el contenedor de Spring Boot
@@ -21,6 +23,9 @@ public class WebSecurityConfig {
     //SE USA EN EL FILTER CHAIN
     @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
+    @Autowired
+    private UsuarioActivoFilter usuarioActivoFilter;
 
     //Para tener al usuario en la fabrica de Spring
     @Bean
@@ -56,6 +61,7 @@ public class WebSecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .addFilterBefore(usuarioActivoFilter, UsernamePasswordAuthenticationFilter.class)
                 // Se definen las reglas de acceso a las rutas
                 .authorizeHttpRequests(auth -> auth
                         //rutas públicas

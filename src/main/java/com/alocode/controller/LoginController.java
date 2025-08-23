@@ -21,10 +21,13 @@ public class LoginController {
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error,
                             @RequestParam(value = "username", required = false) String username,
+                            @RequestParam(value = "inactivo", required = false) String inactivo,
                             Model model, HttpServletRequest request) {
         String mensaje = null;
         String advertencia = null;
-        if (error != null && username != null) {
+        if (inactivo != null) {
+            mensaje = "Su usuario ha sido desactivado. Contacte al administrador.";
+        } else if (error != null && username != null) {
             Optional<Usuario> usuarioOpt = usuarioRepository.getUserByUsername(username);
             if (usuarioOpt.isPresent()) {
                 Usuario usuario = usuarioOpt.get();
