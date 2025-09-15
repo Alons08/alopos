@@ -237,7 +237,7 @@
                                 <tbody>
                                     <tr th:each="mesa : ${mesas}">
                                         <td>
-                                            <span class="mesa-numero">Mesa #<span th:text="${mesa.numero}"></span></span>
+                                            <span class="mesa-numero"><span th:text="${mesa.numero}"></span></span>
                                             <span th:if="${mesa.numero == null}" class="text-danger">(Sin número)</span>
                                         </td>
                                         <td>
@@ -250,7 +250,7 @@
                                         <td class="text-center">
                                             <div class="action-group">
                                                 <a th:href="@{/mesas/editar/{id}(id=${mesa.id})}"
-                                                   class="btn btn-secondary action-btn"
+                                                   class="btn btn-warning action-btn"
                                                    title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                     <span>Editar</span>
@@ -293,7 +293,7 @@
                         <div th:each="mesa : ${mesas}" class="mobile-mesa-card">
                             <div class="mobile-mesa-header">
                                 <h5 class="mobile-mesa-title mb-0">
-                                    Mesa #<span th:text="${mesa.numero}"></span>
+                                    <span th:text="${mesa.numero}"></span>
                                     <span th:if="${mesa.numero == null}" class="text-danger">(Sin número)</span>
                                 </h5>
                                 <span th:text="${mesa.ubicacion}"></span>
@@ -307,7 +307,7 @@
                             
                             <div class="action-group mt-3">
                                 <a th:href="@{/mesas/editar/{id}(id=${mesa.id})}"
-                                   class="btn btn-secondary action-btn"
+                                   class="btn btn-warning action-btn"
                                    title="Editar">
                                     <i class="bi bi-pencil"></i>
                                     <span>Editar</span>

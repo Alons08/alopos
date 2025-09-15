@@ -270,7 +270,6 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Nombre completo</th>
                                         <th>Usuario</th>
                                         <th>Roles</th>
@@ -280,7 +279,6 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="usuario : ${usuarios}">
-                                        <td data-label="ID" th:text="${usuario.id}"></td>
                                         <td data-label="Nombre" th:text="${usuario.nombre}"></td>
                                         <td data-label="Usuario" th:text="${usuario.username}"></td>
                                         <td data-label="Roles">
@@ -303,7 +301,7 @@
                                             <div class="d-flex flex-wrap gap-2">
                                                 <!-- Editar -->
                                                 <a th:href="@{'/admin/usuarios/editar/' + ${usuario.id}}" 
-                                                   class="btn btn-secondary action-btn" 
+                                                   class="btn btn-warning action-btn" 
                                                    th:if="${usuario.roles.?[nombre == 'ADMIN'].isEmpty()}">
                                                     <i class="bi bi-pencil"></i> Editar
                                                 </a>

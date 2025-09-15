@@ -9,12 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         :root {
-            --primary-color: #2c3e50;
+            --primary-color: #4361ee;
             --secondary-color: #34495e;
             --accent-color: #3498db;
             --success-color: #27ae60;
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
+            --cancel-color: #6c757d;
+            --cancel-hover: #5a6268;
         }
         
         body {
@@ -26,7 +28,14 @@
         
         .main-content {
             flex: 1;
-            padding-bottom: 60px;
+            padding-bottom: 20px;
+            margin-top: 40px; /* Espacio entre navbar y formulario */
+        }
+        
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
         }
         
         .form-card {
@@ -35,6 +44,7 @@
             border: none;
             overflow: hidden;
             transition: transform 0.3s ease;
+            margin-bottom: 20px;
         }
         
         .form-card:hover {
@@ -45,29 +55,32 @@
         .card-header {
             background-color: var(--primary-color) !important;
             color: white;
-            padding: 1.25rem 1.5rem;
+            padding: 0.8rem 1rem;
         }
         
         .card-title {
             font-weight: 600;
             margin-bottom: 0;
+            font-size: 1.1rem;
         }
         
         .card-body {
-            padding: 2rem;
+            padding: 1.2rem;
         }
         
         .form-label {
             font-weight: 500;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
         }
         
         .form-control {
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.55rem 0.8rem;
             border: 1px solid #dee2e6;
             transition: all 0.3s;
+            font-size: 1rem;
         }
         
         .form-control:focus {
@@ -76,76 +89,158 @@
         }
         
         .form-check-input {
-            width: 1.2em;
-            height: 1.2em;
+            width: 1.1em;
+            height: 1.1em;
             margin-top: 0.1em;
         }
         
         .form-check-label {
             margin-left: 0.3em;
+            font-size: 1rem;
         }
         
         .btn-submit {
             background-color: var(--primary-color);
             border: none;
-            padding: 0.75rem;
+            padding: 0.55rem;
             font-weight: 500;
             transition: all 0.3s;
+            font-size: 1rem;
         }
         
         .btn-submit:hover {
-            background-color: var(--secondary-color);
+            background-color: #3a56d4;
         }
         
         .btn-cancel {
-            padding: 0.75rem;
+            padding: 0.55rem;
             transition: all 0.3s;
+            font-size: 1rem;
+            background-color: var(--cancel-color);
+            border-color: var(--cancel-color);
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background-color: var(--cancel-hover);
+            border-color: var(--cancel-hover);
+            color: white;
         }
         
         .role-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
         }
         
         .role-item {
             background-color: #f8f9fa;
             border-radius: 50px;
-            padding: 0.5rem 1rem;
+            padding: 0.35rem 0.7rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.3rem;
             border: 1px solid #dee2e6;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .role-item:hover {
+            background-color: #e9ecef;
         }
         
         .role-item.disabled {
             background-color: #e9ecef;
             opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .form-section {
+            margin-bottom: 0.9rem;
+        }
+        
+        .form-text {
+            font-size: 0.8rem;
         }
         
         @media (max-width: 768px) {
+            
+            .form-container {
+                padding: 0 10px;
+            }
+            
             .card-body {
-                padding: 1.5rem;
+                padding: 1rem;
             }
             
             .form-control {
-                padding: 0.65rem 0.9rem;
+                padding: 0.5rem 0.75rem;
             }
         }
         
         @media (max-width: 576px) {
+            
+            
             .card-body {
-                padding: 1.25rem;
+                padding: 0.9rem;
             }
             
             .role-container {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.4rem;
             }
             
             .role-item {
                 width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            .card-header {
+                padding: 0.7rem 0.9rem;
+            }
+            
+            .card-title {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .form-container {
+                padding: 0 5px;
+            }
+            
+            .card-body {
+                padding: 0.8rem;
             }
         }
     </style>
@@ -154,75 +249,82 @@
     <div th:replace="~{fragments/navbar :: navbar}"></div>
     
     <div class="main-content">
-        <div class="container py-4">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 col-md-10">
-                    <div class="card form-card animate__animated animate__fadeIn">
-                        <div class="card-header">
-                            <h5 class="card-title" th:text="${usuarioForm.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></h5>
+        <div class="container form-container">
+            <div class="card form-card animate__animated animate__fadeIn">
+                <div class="card-header">
+                    <h5 class="card-title" th:text="${usuarioForm.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></h5>
+                </div>
+                <div class="card-body">
+                    <form id="userForm" th:action="${usuarioForm.id == null} ? @{/admin/usuarios/guardar} : @{/admin/usuarios/actualizar}" method="post">
+                        <input type="hidden" name="id" th:value="${usuarioForm.id}" />
+                        
+                        <!-- Nombre -->
+                        <div class="form-section">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   th:value="${usuarioForm.nombre}" required>
                         </div>
-                        <div class="card-body">
-                            <form th:action="${usuarioForm.id == null} ? @{/admin/usuarios/guardar} : @{/admin/usuarios/actualizar}" method="post">
-                                <input type="hidden" name="id" th:value="${usuarioForm.id}" />
-                                
-                                <!-- Nombre -->
-                                <div class="mb-4">
-                                    <label for="nombre" class="form-label">Nombre Completo</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" 
-                                           th:value="${usuarioForm.nombre}" required placeholder="Ingrese nombre completo">
-                                </div>
-                                
-                                <!-- Username -->
-                                <div class="mb-4">
-                                    <label for="username" class="form-label">Nombre de usuario</label>
-                                    <input type="text" class="form-control" id="username" name="username" 
-                                           th:value="${usuarioForm.username}" required placeholder="Ingrese nombre de usuario">
-                                </div>
-                                
-                                <!-- Contraseña -->
-                                <div class="mb-4" th:if="${usuarioForm.id == null}">
-                                    <label for="password" class="form-label">Contraseña</label>
-                                    <input type="password" class="form-control" id="password" name="password" 
-                                           minlength="4" required placeholder="Ingrese contraseña">
-                                    <small class="text-muted">Mínimo 4 caracteres</small>
-                                </div>
-                                
-                                <!-- Nueva contraseña (solo para edición) -->
-                                <div class="mb-4" th:if="${usuarioForm.id != null}">
-                                    <label for="password" class="form-label">Nueva contraseña</label>
-                                    <input type="password" class="form-control" id="password" name="password" 
-                                           minlength="4" placeholder="Dejar en blanco para no cambiar">
-                                    <small class="text-muted">Dejar en blanco para mantener la contraseña actual</small>
-                                </div>
-                                
-                                <!-- Roles -->
-                                <div class="mb-4">
-                                    <label class="form-label">Roles</label>
-                                    <div class="role-container">
-                                        <div th:each="rol : ${roles}" class="role-item" 
-                                             th:classappend="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'} ? 'disabled' : ''">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   th:id="${'rol_' + rol.id}" name="rolesIds" th:value="${rol.id}"
-                                                   th:checked="${usuarioForm.roles.contains(rol)}" 
-                                                   th:disabled="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'}">
-                                            <label class="form-check-label" th:for="${'rol_' + rol.id}" th:text="${rol.nombre}"></label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Botones -->
-                                <div class="d-grid gap-3 mt-4">
-                                    <button type="submit" class="btn btn-submit text-white">
-                                        <i class="bi bi-save me-2"></i> 
-                                        <span th:text="${usuarioForm.id == null ? 'Crear Usuario' : 'Actualizar Usuario'}"></span>
-                                    </button>
-                                    <a th:href="@{/admin/usuarios}" class="btn btn-cancel btn-outline-secondary">
-                                        <i class="bi bi-x-circle me-2"></i> Cancelar
-                                    </a>
-                                </div>
-                            </form>
+                        
+                        <!-- Username -->
+                        <div class="form-section">
+                            <label for="username" class="form-label">Nombre de usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   th:value="${usuarioForm.username}" required>
                         </div>
-                    </div>
+                        
+                        <!-- Contraseña -->
+                        <div class="form-section" th:if="${usuarioForm.id == null}">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <div class="password-container">
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       minlength="4" required>
+                                <span class="password-toggle" id="passwordToggle">
+                                    <i class="bi bi-eye"></i>
+                                </span>
+                            </div>
+                            <small class="form-text text-muted">Mínimo 4 caracteres</small>
+                        </div>
+                        
+                        <!-- Nueva contraseña (solo para edición) -->
+                        <div class="form-section" th:if="${usuarioForm.id != null}">
+                            <label for="newPassword" class="form-label">Nueva contraseña</label>
+                            <div class="password-container">
+                                <input type="password" class="form-control" id="newPassword" name="password" 
+                                       minlength="4">
+                                <span class="password-toggle" id="newPasswordToggle">
+                                    <i class="bi bi-eye"></i>
+                                </span>
+                            </div>
+                            <small class="form-text text-muted">Dejar en blanco para mantener la contraseña actual</small>
+                        </div>
+                        
+                        <!-- Roles -->
+                        <div class="form-section">
+                            <label class="form-label">Roles <span class="text-danger">*</span></label>
+                            <div class="role-container">
+                                <div th:each="rol : ${roles}" class="role-item" 
+                                     th:classappend="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'} ? 'disabled' : ''">
+                                    <input class="form-check-input" type="checkbox" 
+                                           th:id="${'rol_' + rol.id}" name="rolesIds" th:value="${rol.id}"
+                                           th:checked="${usuarioForm.roles.contains(rol)}" 
+                                           th:disabled="${esAdmin != null and esAdmin and rol.nombre == 'ADMIN'}">
+                                    <label class="form-check-label" th:for="${'rol_' + rol.id}" th:text="${rol.nombre}"></label>
+                                </div>
+                            </div>
+                            <div id="roleError" class="error-message">Debe seleccionar al menos un rol</div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="d-flex flex-column flex-md-row gap-2 mt-3 btn-group">
+                            <button type="submit" class="btn btn-submit text-white flex-fill">
+                                <i class="bi bi-save me-2"></i> 
+                                <span th:text="${usuarioForm.id == null ? 'Guardar' : 'Actualizar'}"></span>
+                            </button>
+                            <a th:href="@{/admin/usuarios}" class="btn btn-cancel flex-fill">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -233,10 +335,74 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Validación adicional si es necesaria
-            const form = document.querySelector('form');
+            // Toggle para mostrar/ocultar contraseña
+            function setupPasswordToggle(toggleId, inputId) {
+                const toggle = document.getElementById(toggleId);
+                const input = document.getElementById(inputId);
+                
+                if (toggle && input) {
+                    toggle.addEventListener('click', function() {
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            toggle.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                        } else {
+                            input.type = 'password';
+                            toggle.innerHTML = '<i class="bi bi-eye"></i>';
+                        }
+                    });
+                }
+            }
+            
+            setupPasswordToggle('passwordToggle', 'password');
+            setupPasswordToggle('newPasswordToggle', 'newPassword');
+            
+            // Validación de formulario
+            const form = document.getElementById('userForm');
+            const roleCheckboxes = document.querySelectorAll('input[name="rolesIds"]:not(:disabled)');
+            const roleError = document.getElementById('roleError');
+            
             form.addEventListener('submit', function(e) {
-                // Puedes agregar validaciones adicionales aquí
+                let atLeastOneChecked = false;
+                
+                roleCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        atLeastOneChecked = true;
+                    }
+                });
+                
+                if (!atLeastOneChecked) {
+                    e.preventDefault();
+                    roleError.style.display = 'block';
+                    
+                    // Scroll to error
+                    roleError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Agregar animación de shake al contenedor de roles
+                    const roleContainer = document.querySelector('.role-container');
+                    roleContainer.classList.add('animate__animated', 'animate__headShake');
+                    setTimeout(() => {
+                        roleContainer.classList.remove('animate__animated', 'animate__headShake');
+                    }, 1000);
+                } else {
+                    roleError.style.display = 'none';
+                }
+            });
+            
+            // Ocultar mensaje de error cuando se selecciona un rol
+            roleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    let atLeastOneChecked = false;
+                    
+                    roleCheckboxes.forEach(cb => {
+                        if (cb.checked) {
+                            atLeastOneChecked = true;
+                        }
+                    });
+                    
+                    if (atLeastOneChecked) {
+                        roleError.style.display = 'none';
+                    }
+                });
             });
         });
     </script>
